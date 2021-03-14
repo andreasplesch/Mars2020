@@ -1,0 +1,449 @@
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
+        <meta http-equiv="X-UA-Compatible" content="chrome=1,IE=edge"/>
+        <title>10cm Lookdown map for Percy</title>
+        <script type="text/javascript" src="https://www.x3dom.org/download/dev/x3dom-full.js"></script>
+        <script type="text/javascript" src="M20_traverse_eq_points.js"></script>
+        <link rel="stylesheet" type="text/css" href="https://www.x3dom.org/download/dev/x3dom.css"/>
+        <style>
+            body {
+                margin: 0px
+            }
+
+            X3D {
+                width: 100%;
+                height: 100%;
+                background-color: black;
+                filter: contrast(1.5);
+            }
+
+            .group {
+            }
+
+            .x3dom-canvas {
+                cursor: crosshair;
+            }
+
+            .resetbutton {
+                background: rgb(155 155 155 / 41%);
+                position: absolute;
+                left: 0px;
+                margin: 4px;
+            }
+
+            .info-font {
+                font-family: monospace;
+                font-size: large;
+                color: white;
+            }
+
+            .info {
+                position: absolute;
+                left: 0px;
+                margin-top: 39px;
+                margin-left: 4px;
+                background: rgb(165 165 165 / 20%);
+                padding: 5px;
+            }
+
+            .list {
+                position: absolute;
+                left: 0px;
+                margin-top: 80px;
+                margin-left: 4px;
+                background: rgb(165 165 165 / 20%);
+                padding: 5px;
+                user-select: text;
+            }
+
+            .attribution {
+                position: absolute;
+                right: 0px;
+                margin-right: 4px;
+                background: rgb(165 165 165 / 20%);
+                padding: 5px;
+                bottom: 10px;
+            }
+
+            .extra-info {
+                position: absolute;
+                left: 0px;
+                margin-left: 4px;
+                background: rgb(165 165 165 / 20%);
+                padding: 5px;
+                bottom: 10px;
+            }
+
+            .small-font {
+                font-family: monospace;
+                font-size: small;
+                color: white;
+            }
+
+            .sliderbox {
+                position: absolute;
+                left: 30px;
+                margin-left: 4px;
+                background: rgb(165 165 165 / 20%);
+                padding: 5px;
+                bottom: 50px;
+                transform: rotate(270deg);
+                transform-origin: left;
+            }
+
+            .atright {
+                position: absolute;
+                right: 0px;
+                margin-right: 4px;
+                background: rgb(165 165 165 / 20%);
+                padding: 5px;
+                top: 5px;
+            }
+
+            .slider {
+                width: 200px;
+                height: 30px;
+                margin: 10px;
+                form: rotate(270deg);
+            }
+
+            .sliderlabel {
+                position: absolute;
+                left: 50%;
+                top: 0px;
+                margin-top: 5px;
+            }
+        </style>
+    </head>
+    <script>
+        function init() {
+            deg2rad = Math.PI / 180;
+            MarsR = 3396190;
+            map2trueEasting = Math.cos(18.44462 * deg2rad);
+            infoDiv = document.querySelector('#infoDiv');
+            listDiv = document.querySelector('#listDiv');
+            labelY = document.querySelector('[for="yScale"]');
+            labelContrast = document.querySelector('[for="contrast"]');
+            X3D = document.querySelector('X3D');
+            scaleTrafo = X3D.querySelector('#scaleTrafo');
+            barTrafo = X3D.querySelector('#barTrafo');
+            roverTrafo = X3D.querySelector('#roverTrafo');
+            roverInitTrafo = X3D.querySelector('#roverInitTrafo');
+            waypointsGroup = X3D.querySelector('[DEF="WAYPOINTS"]');
+            yScale = 5;
+            yDatum = -2570;
+            nPoints = 10;
+            roverPos1 = new x3dom.fields.SFVec3f(4590876.63,1,-1093301.70);
+            pointStack = [{
+                pos: new x3dom.fields.SFVec3f(roverPos1.x,yDatum,roverPos1.z),
+                dst: 0,
+                trueDst: 0
+            }];
+            H = 1.97;
+            // camera height
+
+            Current_WaypointURL = "https://mars.nasa.gov/mmgis-maps/M20/Layers/json/M20_waypoints_current.json";
+            All_WaypointsURL = "https://mars.nasa.gov/mmgis-maps/M20/Layers/json/M20_waypoints.json";
+            CycleInterval = 20;
+            //seconds
+            initAnimation();
+            addWaypoints();
+
+            //<TextureCoordinate point="0 0 1 1"></TextureCoordinate>
+            //zDimension='452' xSpacing='1.000162168140152241' zDimension='452' zSpacing='1.000774557521954211'
+            //translation='4590641.917 2570 -1093538.3776'>
+            //calcPanoTexCoords(document.querySelector('elevationgrid'), document.querySelector('#posTrafo'), roverPos1);
+
+        }
+
+        function initAnimation() {
+            var ts = document.querySelector('[DEF=TS]');
+            ts.cycleInterval = CycleInterval;
+            ts.loop = true;
+            var features = M20_traverse_eq_points.features;
+            //features.sort((a, b) => a.properties.fromRMC < b.properties.fromRMC ? -1 : 1);
+            var pIntp = document.querySelector('[DEF=PI]');
+            var key = features.map((v,i)=>0.1 + 0.8 * i / (features.length - 1));
+            key.unshift(0);
+            key.push(1);
+            var keyValue = features.map(v=>{
+                var c = v.geometry.coordinates;
+                return [c[0], 1.0 * yScale, -c[1]]
+            }
+            );
+            keyValue.unshift(keyValue[0]);
+            keyValue.push(keyValue[keyValue.length - 1]);
+            pIntp.key = key.join();
+            pIntp.keyValue = keyValue.join();
+            var oIntp = document.querySelector('[DEF=OI]');
+            var key = features.map((v,i)=>0.1 + 0.8 * i / (features.length - 1));
+            var keyValue = features.map(v=>{
+                var c = v.properties.angle;
+                return [0, 1, 0, -c * deg2rad]
+            }
+            );
+            keyValue.unshift(keyValue[0]);
+            keyValue.push(keyValue[keyValue.length - 1]);
+            oIntp.key = key.join();
+            oIntp.keyValue = keyValue.join();
+            //adjust final yaw and set way points
+            fetch(Current_WaypointURL).then(response=>response.json()).then(waypoints=>{
+                var yaw = waypoints.features[0].properties.yaw;
+                keyValue[keyValue.length - 1] = [0, 1, 0, -yaw * deg2rad];
+                keyValue[keyValue.length - 2] = [0, 1, 0, -yaw * deg2rad];
+                oIntp.keyValue = keyValue.join();
+                //
+                map2trueEasting = Math.cos(waypoints.features[0].geometry.coordinates[1] * deg2rad);
+            }
+            );
+        }
+
+        function addWaypoints() {
+            fetch(All_WaypointsURL).then(response=>response.json()).then(waypoints=>{
+                waypoints.features.forEach(f=>waypointsGroup.appendChild(wpFromFeature(f)));
+            }
+            );
+        }
+
+        function wpFromFeature(f) {
+            var wp = document.createElement('WayPoint');
+            var props = f.properties;
+            wp.setAttribute('location', fromLatLong(f.geometry.coordinates));
+            wp.setAttribute('text', `"sol ${props.sol}" "drive ${props.drive}"`);
+            return wp
+        }
+
+        function fromLatLong(coordArray) {
+            var easting = coordArray[0] * MarsR * deg2rad;
+            var northing = coordArray[1] * MarsR * deg2rad;
+            var elevation = coordArray[2];
+            return [easting, elevation, -northing].join()
+        }
+
+        function calcPanoTexCoords(grid, trafo, pos) {
+            var xdim = grid.xDimension * 1.0;
+            var zdim = grid.zDimension * 1.0;
+            var xSpacing = grid.xSpacing * 1.0;
+            var zSpacing = grid.zSpacing * 1.0;
+            var prec = 7;
+
+            var offset = trafo.getFieldValue("translation").subtract(pos);
+            var height = grid.getFieldValue("height");
+
+            var uv = [];
+
+            for (var i = 0; i < zdim; i++) {
+                for (var j = 0; j < xdim; j++) {
+                    var n = j + i * xdim;
+                    var h = H - (height[n] - yDatum);
+                    var dx = offset.x + j * xSpacing;
+                    var dy = offset.z + i * zSpacing;
+                    var d = Math.sqrt(dx * dx + dy * dy);
+                    var alpha = Math.atan(h / d);
+                    var beta = Math.atan2(dy, dx) + 110 * Math.PI / 180;
+                    var u = (0.5 + beta / (2 * Math.PI)) % 1;
+                    var v = 0.5 + alpha / (Math.PI);
+                    uv.push(u, v);
+                    //.toFixed(prec),v.toFixed(prec));
+                }
+            }
+
+            var texcoord = document.createElement('TextureCoordinate');
+            texcoord.setAttribute('point', uv.join());
+            grid.appendChild(texcoord);
+        }
+
+        function mousemove(e) {
+            infoDiv.textContent = `X Y elevation: ` + [e.worldX, -e.worldZ, e.worldY / yScale + yDatum].map(prettify).join(" ");
+        }
+
+        function prettify(x) {
+            return x.toFixed(2);
+        }
+
+        function mouseclick(e) {
+            var prev = pointStack[0];
+            var pos = new x3dom.fields.SFVec3f(e.worldX,e.worldY / yScale + yDatum,e.worldZ);
+            if (prev.pos.equals(pos, 0.01)) // assume double click
+            {
+                pointStack.shift();
+            } else {
+                var dist = pos.subtract(prev.pos);
+                var trueDist = new x3dom.fields.SFVec3f(dist.x * map2trueEasting,dist.y,dist.z);
+                var point = {
+                    pos: pos,
+                    dst: dist.length(),
+                    trueDst: trueDist.length()
+                };
+                var n = pointStack.unshift(point);
+            }
+            listDiv.textContent = "clicked points, true distance from last [m]:\n\n" + pointStack.slice(0, nPoints).map(ppPoint).join("\n");
+            function ppPoint(p) {
+                return [p.pos.x, -p.pos.z, p.pos.y, p.trueDst].map(prettify).join(' ')
+            }
+        }
+
+        function scaleY(v) {
+            yScale = parseFloat(v);
+            labelY.textContent = yScale.toFixed(1) + ' x v.e.';
+            scaleTrafo.scale = [1, yScale, 1].join();
+            roverInitTrafo.translation = [0, -4.5 + roverPos1.y * yScale, 0].join();
+            barTrafo.scale = [0.05, yScale, 0.05].join();
+        }
+
+        function contrast(v) {
+            var c = parseFloat(v);
+            labelContrast.textContent = c.toFixed(2) + ' contrast';
+            X3D.style.filter = `contrast(${c})`;
+        }
+    </script>
+    <body onload='init()'>
+        <div class="group">
+            <X3D xmlns="http://www.web3d.org/specifications/x3d-namespace" id="x3d" disableLeftDrag='true' disableKeys='true' showStat="false" showLog="false">
+                <button class="resetbutton info-font" onclick='this.parentNode.runtime.resetView()'>RESET</button>
+                <div id='infoDiv' class="info info-font">X Y elevation</div>
+                <pre id='listDiv' class="list info-font">click to add points</pre>
+                <div class='small-font extra-info'>Equirectangular Mars 2000 Sphere projection</div>
+                <div id='attributions' class="small-font attribution">NASA/JPL-Caltech/Mars2020 HiRISE (c)2021 Andreas Plesch
+                </div>
+                <div class='sliderbox'>
+                    <input oninput="scaleY(this.value)" class='slider' type="range" id="yScale" name="yScale" step="0.1" min="1" max="9">
+                    <label class='small-font sliderlabel' for="yScale">5.0 x v.e.</label>
+                </div>
+                <div class='atright'>
+                    <input oninput="contrast(this.value)" class='slider' type="range" id="contrast" name="contrast" step="0.01" min="0" max="3">
+                    <label class='small-font sliderlabel' for="contrast">1.50 contrast</label>
+                </div>
+                <Scene>
+                    <Environment id="gamma" gammaCorrectionDefault="none"></Environment>
+                    <NavigationInfo headlight='false' type='"EXAMINE"' explorationMode='-rotate'></NavigationInfo>
+                    <WorldInfo title='animated Mars Rover Perserverance Map'></WorldInfo>
+                    <ProtoDeclare name='WayPointText'>
+                        <ProtoInterface>
+                            <field name='offset' type='SFVec3f' value='0 0 0' accessType='inputOutput'></field>
+                            <field name='string' type='MFString' accessType='inputOutput'></field>
+                            <field name='size' type='SFFloat' value='1.0' accessType='initializeOnly'></field>
+                            <field name='color' type='SFColor' value='0.2 0.6 1' accessType='inputOutput'></field>
+                            <field name='justify' type='MFString' value='"MIDDLE" "MIDDLE"' accessType='initializeOnly'></field>
+                            <field name='style' type='SFString' value='PLAIN' accessType='initializeOnly'></field>
+                            <field name='family' type='MFString' value='"SERIF"' accessType='initializeOnly'></field>
+                        </ProtoInterface>
+                        <ProtoBody>
+                            <Transform rotation='1 0 0 -1.57'>
+                                <IS>
+                                    <connect nodeField='translation' protoField='offset'></connect>
+                                </IS>
+                                <Shape>
+                                    <Appearance>
+                                        <Material>
+                                            <IS>
+                                                <connect nodeField='diffuseColor' protoField='color'></connect>
+                                            </IS>
+                                        </Material>
+                                    </Appearance>
+                                    <Text solid='false'>
+                                        <IS>
+                                            <connect nodeField='string' protoField='string'></connect>
+                                        </IS>
+                                        <FontStyle>
+                                            <IS>
+                                                <connect nodeField='family' protoField='family'></connect>
+                                                <connect nodeField='justify' protoField='justify'></connect>
+                                                <connect nodeField='size' protoField='size'></connect>
+                                                <connect nodeField='style' protoField='style'></connect>
+                                            </IS>
+                                        </FontStyle>
+                                    </Text>
+                                </Shape>
+                            </Transform>
+                        </ProtoBody>
+                    </ProtoDeclare>
+                    <ProtoDeclare name='WayPoint'>
+                        <ProtoInterface>
+                            <field name='location' type='SFVec3f' value='0 0 0' accessType='inputOutput'></field>
+                            <field name='textOffset' type='SFVec3f' value='1 1 -1' accessType='inputOutput'></field>
+                            <field name='text' type='MFString' accessType='inputOutput'></field>
+                            <field name='size' type='SFFloat' value='1.0' accessType='initializeOnly'></field>
+                            <field name='color' type='SFColor' value='0.2 0.6 1' accessType='inputOutput'></field>
+                        </ProtoInterface>
+                        <ProtoBody>
+                            <Transform>
+                                <IS>
+                                    <connect nodeField='translation' protoField='location'></connect>
+                                </IS>
+                                <WayPointText style='BOLD' justify='"BEGIN" "END"'>
+                                    <IS>
+                                        <connect nodeField='offset' protoField='textOffset'></connect>
+                                    </IS>
+                                    <IS>
+                                        <connect nodeField='string' protoField='text'></connect>
+                                    </IS>
+                                    <IS>
+                                        <connect nodeField='color' protoField='color'></connect>
+                                    </IS>
+                                </WayPointText>
+                                <Shape>
+                                    <Appearance>
+                                        <Material transparency='0.8'>
+                                            <IS>
+                                                <connect nodeField='diffuseColor' protoField='color'></connect>
+                                            </IS>
+                                        </Material>
+                                    </Appearance>
+                                    <Sphere>
+                                        <IS>
+                                            <connect nodeField='radius' protoField='size'></connect>
+                                        </IS>
+                                    </Sphere>
+                                </Shape>
+                            </Transform>
+                        </ProtoBody>
+                    </ProtoDeclare>
+                    <DirectionalLight direction='-1, -0.5, -1' ambientintensity='1'></DirectionalLight>
+                    <Viewpoint position="4590876.63 312 -1093301.70" orientation="1 0 0 -1.57" centerOfRotation="4590876.63 0 -1093301.70" fieldOfView="0.52" description=""></Viewpoint>
+                    <Transform id='scaleTrafo' scale='1 5 1'>
+                        <Transform onmousemove='mousemove(event)' onclick='mouseclick(event)' id='posTrafo' translation='4590641.917 2570 -1093538.3776'>
+                            <Inline url='M20_elevationgridA.x3d'></Inline>
+                        </Transform>
+                        <Transform DEF='WAYPOINTS' translation='0 2570 0'></Transform>
+                    </Transform>
+                    <Transform id='roverTrafo' DEF='roverTrafo' translation='4590877.8 0 -1093299.70' rotation='0 1 0 -2.29'>
+                        <Transform id='roverInitTrafo' translation='0 0.5 0' rotation='0 1 0 3.1415'>
+                            <Inline namespacename='rover' url='https://raw.githubusercontent.com/andreasplesch/Library/gh-pages/Examples/Mars2020/Perseverance.glb'></Inline>
+                        </Transform>
+                        <Transform id='barTrafo' scale='.05 5 .05' translation='0 -5.0 0'>
+                            <Shape>
+                                <Appearance>
+                                    <Material></Material>
+                                </Appearance>
+                                <Box></Box>
+                            </Shape>
+                        </Transform>
+                    </Transform>
+                    <TimeSensor DEF='TS' loop='false' cycleInterval='20' enabled='true'></TimeSensor>
+                    <PositionInterpolator DEF='PI' key='0 0.2 0.4 0.6 0.8 1' keyValue='
+                    4590876.63 0.5 -1093299.70,
+                    4590876.63 0.5 -1093301.70,
+                    4590880.59 0.5 -1093297.35,
+                    4590880.59 0.5 -1093297.35,
+                    4590880.87 0.5 -1093294.80,
+                    4590880.87 0.5 -1093294.80
+                    '></PositionInterpolator>
+                    <OrientationInterpolator DEF='OI' key='0 0.2 0.4 0.6 0.8 1' keyValue='
+                    0 1 0 0
+                    0 1 0 0
+                    0 1 0 0
+                    0 1 0 2.61791666666
+                    0 1 0 2.61791666666
+                    0 1 0 2.61791666666
+                    '></OrientationInterpolator>
+                    <ROUTE fromNode='TS' fromField='fraction_changed' toNode='PI' toField='set_fraction'></ROUTE>
+                    <ROUTE fromNode='PI' fromField='value_changed' toNode='roverTrafo' toField='set_translation'></ROUTE>
+                    <ROUTE fromNode='TS' fromField='fraction_changed' toNode='OI' toField='set_fraction'></ROUTE>
+                    <ROUTE fromNode='OI' fromField='value_changed' toNode='roverTrafo' toField='set_rotation'></ROUTE>
+                </Scene>
+            </X3D>
+        </div>
+    </body>
+</html>
