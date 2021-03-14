@@ -120,7 +120,7 @@
         function init() {
             deg2rad = Math.PI / 180;
             MarsR = 3396190;
-            map2trueEasting = Math.cos(18.44462 * deg2rad);
+            map2trueEasting = Math.cos(18.4663 * deg2rad); // center of landing ellipse, standard parallel
             infoDiv = document.querySelector('#infoDiv');
             listDiv = document.querySelector('#listDiv');
             labelY = document.querySelector('[for="yScale"]');
@@ -145,8 +145,7 @@
 
             Current_WaypointURL = "https://mars.nasa.gov/mmgis-maps/M20/Layers/json/M20_waypoints_current.json";
             All_WaypointsURL = "https://mars.nasa.gov/mmgis-maps/M20/Layers/json/M20_waypoints.json";
-            CycleInterval = 20;
-            //seconds
+            CycleInterval = 20; //seconds
             initAnimation();
             addWaypoints();
 
@@ -193,14 +192,14 @@
                 keyValue[keyValue.length - 1] = [0, 1, 0, -yaw * deg2rad];
                 keyValue[keyValue.length - 2] = [0, 1, 0, -yaw * deg2rad];
                 oIntp.keyValue = keyValue.join();
-                //
-                map2trueEasting = Math.cos(waypoints.features[0].geometry.coordinates[1] * deg2rad);
+                //potentially update standard parallel
+                //map2trueEasting = Math.cos(waypoints.features[0].geometry.coordinates[1] * deg2rad);
             }
             );
         }
 
         function addWaypoints() {
-            fetch(All_WaypointsURL).then(response=>response.json()).then(waypoints=>{
+            fetch(All_WaypointsURL).then(response=>('json' in response) ? response.json() : console.warn(response)).then(waypoints=>{
                 waypoints.features.forEach(f=>waypointsGroup.appendChild(wpFromFeature(f)));
             }
             );
@@ -219,39 +218,6 @@
             var northing = coordArray[1] * MarsR * deg2rad;
             var elevation = coordArray[2];
             return [easting, elevation, -northing].join()
-        }
-
-        function calcPanoTexCoords(grid, trafo, pos) {
-            var xdim = grid.xDimension * 1.0;
-            var zdim = grid.zDimension * 1.0;
-            var xSpacing = grid.xSpacing * 1.0;
-            var zSpacing = grid.zSpacing * 1.0;
-            var prec = 7;
-
-            var offset = trafo.getFieldValue("translation").subtract(pos);
-            var height = grid.getFieldValue("height");
-
-            var uv = [];
-
-            for (var i = 0; i < zdim; i++) {
-                for (var j = 0; j < xdim; j++) {
-                    var n = j + i * xdim;
-                    var h = H - (height[n] - yDatum);
-                    var dx = offset.x + j * xSpacing;
-                    var dy = offset.z + i * zSpacing;
-                    var d = Math.sqrt(dx * dx + dy * dy);
-                    var alpha = Math.atan(h / d);
-                    var beta = Math.atan2(dy, dx) + 110 * Math.PI / 180;
-                    var u = (0.5 + beta / (2 * Math.PI)) % 1;
-                    var v = 0.5 + alpha / (Math.PI);
-                    uv.push(u, v);
-                    //.toFixed(prec),v.toFixed(prec));
-                }
-            }
-
-            var texcoord = document.createElement('TextureCoordinate');
-            texcoord.setAttribute('point', uv.join());
-            grid.appendChild(texcoord);
         }
 
         function mousemove(e) {
@@ -296,6 +262,40 @@
             var c = parseFloat(v);
             labelContrast.textContent = c.toFixed(2) + ' contrast';
             X3D.style.filter = `contrast(${c})`;
+        }
+        
+        // NOT USED
+        function calcPanoTexCoords(grid, trafo, pos) {
+            var xdim = grid.xDimension * 1.0;
+            var zdim = grid.zDimension * 1.0;
+            var xSpacing = grid.xSpacing * 1.0;
+            var zSpacing = grid.zSpacing * 1.0;
+            var prec = 7;
+
+            var offset = trafo.getFieldValue("translation").subtract(pos);
+            var height = grid.getFieldValue("height");
+
+            var uv = [];
+
+            for (var i = 0; i < zdim; i++) {
+                for (var j = 0; j < xdim; j++) {
+                    var n = j + i * xdim;
+                    var h = H - (height[n] - yDatum);
+                    var dx = offset.x + j * xSpacing;
+                    var dy = offset.z + i * zSpacing;
+                    var d = Math.sqrt(dx * dx + dy * dy);
+                    var alpha = Math.atan(h / d);
+                    var beta = Math.atan2(dy, dx) + 110 * Math.PI / 180;
+                    var u = (0.5 + beta / (2 * Math.PI)) % 1;
+                    var v = 0.5 + alpha / (Math.PI);
+                    uv.push(u, v);
+                    //.toFixed(prec),v.toFixed(prec));
+                }
+            }
+
+            var texcoord = document.createElement('TextureCoordinate');
+            texcoord.setAttribute('point', uv.join());
+            grid.appendChild(texcoord);
         }
     </script>
     <body onload='init()'>
