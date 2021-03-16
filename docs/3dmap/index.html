@@ -4,7 +4,6 @@
         <meta http-equiv="X-UA-Compatible" content="chrome=1,IE=edge"/>
         <title>10cm Lookdown map for Percy</title>
         <script type="text/javascript" src="https://www.x3dom.org/download/dev/x3dom-full.js"></script>
-        <script type="text/javascript" src="M20_traverse_eq_points.js"></script>
         <link rel="stylesheet" type="text/css" href="https://www.x3dom.org/download/dev/x3dom.css"/>
         <style>
             body {
@@ -131,7 +130,8 @@
         function init() {
             deg2rad = Math.PI / 180;
             MarsR = 3396190;
-            map2trueEasting = Math.cos(18.4663 * deg2rad); // center of landing ellipse, standard parallel
+            map2trueEasting = Math.cos(18.4663 * deg2rad);
+            // center of landing ellipse, standard parallel
             infoDiv = document.querySelector('#infoDiv');
             listDiv = document.querySelector('#listDiv');
             labelY = document.querySelector('[for="yScale"]');
@@ -156,7 +156,9 @@
 
             Current_WaypointURL = "https://mars.nasa.gov/mmgis-maps/M20/Layers/json/M20_waypoints_current.json";
             All_WaypointsURL = "https://mars.nasa.gov/mmgis-maps/M20/Layers/json/M20_waypoints.json";
-            CycleInterval = 20; //seconds
+            TraverseURL = "https://mars.nasa.gov/mmgis-maps/M20/Layers/json/M20_traverse.json";
+            //seconds
+            CycleInterval = 20;
             initAnimation();
             addWaypoints();
 
@@ -167,19 +169,23 @@
 
         }
 
-        function initAnimation() {
+        async function initAnimation() {
             var ts = document.querySelector('[DEF=TS]');
             ts.cycleInterval = CycleInterval;
             ts.loop = true;
-            var features = M20_traverse_eq_points.features;
+            var traverse = await (await fetch(TraverseURL)).json();
             //features.sort((a, b) => a.properties.fromRMC < b.properties.fromRMC ? -1 : 1);
             var pIntp = document.querySelector('[DEF=PI]');
-            var key = features.map((v,i)=>0.1 + 0.8 * i / (features.length - 1));
+            var coords = traverse.features.reduce((a,f)=>a.concat(f.geometry.coordinates), []);
+            var key = coords.map((v,i)=>0.1 + 0.8 * i / (coords.length - 1));
             key.unshift(0);
             key.push(1);
-            var keyValue = features.map(v=>{
-                var c = v.geometry.coordinates;
-                return [c[0], 1.0 * yScale, -c[1]]
+            var keyValue = coords.map(v=>{
+                return fromLatLong({
+                    lon: v[0],
+                    lat: v[1],
+                    elev_geoid: 1.0 * yScale
+                })
             }
             );
             keyValue.unshift(keyValue[0]);
@@ -187,30 +193,39 @@
             pIntp.key = key.join();
             pIntp.keyValue = keyValue.join();
             var oIntp = document.querySelector('[DEF=OI]');
-            var key = features.map((v,i)=>0.1 + 0.8 * i / (features.length - 1));
-            var keyValue = features.map(v=>{
-                var c = v.properties.angle;
-                return [0, 1, 0, -c * deg2rad]
+            var keyValue = coords.map((v,i)=>{
+                var xyz0 = fromLatLong({
+                    lon: v[0],
+                    lat: v[1],
+                    elev_geoid: 0
+                });
+                var next = (i + 1) in coords ? coords[i + 1] : v;
+                var xyz1 = fromLatLong({
+                    lon: next[0],
+                    lat: next[1],
+                    elev_geoid: 0
+                });
+                var dx = xyz1[0] - xyz0[0];
+                var dy = xyz1[2] - xyz0[2];
+                return [0, 1, 0, -Math.atan2(dy, dx) - Math.PI / 2]
             }
             );
             keyValue.unshift(keyValue[0]);
             keyValue.push(keyValue[keyValue.length - 1]);
             oIntp.key = key.join();
             oIntp.keyValue = keyValue.join();
-            //adjust final yaw and set way points
-            fetch(Current_WaypointURL).then(response=>response.json()).then(waypoints=>{
-                var yaw = waypoints.features[0].properties.yaw;
-                keyValue[keyValue.length - 1] = [0, 1, 0, -yaw * deg2rad];
-                keyValue[keyValue.length - 2] = [0, 1, 0, -yaw * deg2rad];
-                oIntp.keyValue = keyValue.join();
-                //potentially update standard parallel
-                //map2trueEasting = Math.cos(waypoints.features[0].geometry.coordinates[1] * deg2rad);
-            }
-            );
+            //adjust final yaw
+            var waypoints = await (await fetch(Current_WaypointURL)).json();
+            var yaw = waypoints.features[0].properties.yaw;
+            keyValue[keyValue.length - 1] = [0, 1, 0, -yaw * deg2rad];
+            keyValue[keyValue.length - 2] = [0, 1, 0, -yaw * deg2rad];
+            oIntp.keyValue = keyValue.join();
+            //potentially update standard parallel
+            //map2trueEasting = Math.cos(waypoints.features[0].geometry.coordinates[1] * deg2rad);
         }
 
         function addWaypoints() {
-            fetch(All_WaypointsURL).then(response=>('json' in response) ? response.json() : console.warn(response)).then(waypoints=>{
+            fetch(All_WaypointsURL).then(response=>('json'in response) ? response.json() : console.warn(response)).then(waypoints=>{
                 waypoints.features.forEach(f=>waypointsGroup.appendChild(wpFromFeature(f)));
             }
             );
@@ -219,16 +234,16 @@
         function wpFromFeature(f) {
             var wp = document.createElement('WayPoint');
             var props = f.properties;
-            wp.setAttribute('location', fromLatLong(f.geometry.coordinates));
+            wp.setAttribute('location', fromLatLong(props).join());
             wp.setAttribute('text', `"sol ${props.sol}" "drive ${props.drive}"`);
             return wp
         }
 
-        function fromLatLong(coordArray) {
-            var easting = coordArray[0] * MarsR * deg2rad;
-            var northing = coordArray[1] * MarsR * deg2rad;
-            var elevation = coordArray[2];
-            return [easting, elevation, -northing].join()
+        function fromLatLong(props) {
+            var easting = props.lon * MarsR * deg2rad;
+            var northing = props.lat * MarsR * deg2rad;
+            var elevation = props.elev_geoid;
+            return [easting, elevation, -northing]
         }
 
         function mousemove(e) {
@@ -245,9 +260,7 @@
             if (prev.pos.equals(pos, 0.01)) // assume double click
             {
                 pointStack.shift();
-            }
-            else
-            {
+            } else {
                 var dist = pos.subtract(prev.pos);
                 var trueDist = new x3dom.fields.SFVec3f(dist.x * map2trueEasting,dist.y,dist.z);
                 var point = {
@@ -276,7 +289,7 @@
             labelContrast.textContent = c.toFixed(2) + ' contrast';
             X3D.style.filter = `contrast(${c})`;
         }
-        
+
         // NOT USED
         function calcPanoTexCoords(grid, trafo, pos) {
             var xdim = grid.xDimension * 1.0;
@@ -417,8 +430,7 @@
                     </ProtoDeclare>
                     <DirectionalLight direction='-1, -0.5, -1' ambientintensity='1'></DirectionalLight>
                     <Viewpoint id="mapView" position="4590876.63 312 -1093301.70" orientation="1 0 0 -1.57" centerOfRotation="4590876.63 0 -1093301.70" fieldOfView="0.52" description="Map view"></Viewpoint>
-                    <Viewpoint id="northView" position="4590882.04816 121.70554 -1093125.99768" orientation="-0.99951 0.01929 -0.02464 0.67771" 
-	centerOfRotation="4590878 0 -1093299" fieldOfView="0.52" description="Perspective to N"></Viewpoint>
+                    <Viewpoint id="northView" position="4590882.04816 121.70554 -1093125.99768" orientation="-0.99951 0.01929 -0.02464 0.67771" centerOfRotation="4590878 0 -1093299" fieldOfView="0.52" description="Perspective to N"></Viewpoint>
                     <Transform id='scaleTrafo' scale='1 5 1'>
                         <Transform onmousemove='mousemove(event)' onclick='mouseclick(event)' id='posTrafo' translation='4590641.917 2570 -1093538.3776'>
                             <Inline url='M20_elevationgridA.x3d'></Inline>
