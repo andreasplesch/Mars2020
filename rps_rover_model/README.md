@@ -11,3 +11,5 @@ It was possible to decompress using the included lzf.js, and the parse the PLY m
 The parsed data was then added to the existing hierarchy.json, in the geometry[0] objects, as an additional "parsed" property.
 
 This should make it possible to convert the hierarchy to other formats.
+
+https://we.tl/t-dhaD0KKOfM
