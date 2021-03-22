@@ -174,7 +174,8 @@
             ts.cycleInterval = CycleInterval;
             ts.loop = true;
             var traverse = await (await fetch(TraverseURL)).json();
-            //features.sort((a, b) => a.properties.fromRMC < b.properties.fromRMC ? -1 : 1);
+            traverse.features.sort((a, b) => 
+                parseInt(a.properties.toRMC.slice(2)) < parseInt(b.properties.toRMC.slice(2)) ? -1 : 1);
             var pIntp = document.querySelector('[DEF=PI]');
             var coords = traverse.features.reduce((a,f)=>a.concat(f.geometry.coordinates), []);
             var key = coords.map((v,i)=>0.1 + 0.8 * i / (coords.length - 1));
@@ -235,7 +236,7 @@
             var wp = document.createElement('WayPoint');
             var props = f.properties;
             wp.setAttribute('location', fromLatLong(props).join());
-            wp.setAttribute('text', `"sol ${props.sol}" "drive ${props.drive}"`);
+            wp.setAttribute('text', `"sol ${props.sol}, drive ${props.drive}"`);
             return wp
         }
 
