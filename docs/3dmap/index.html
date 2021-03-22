@@ -142,6 +142,15 @@
             roverTrafo = X3D.querySelector('#roverTrafo');
             roverInitTrafo = X3D.querySelector('#roverInitTrafo');
             waypointsGroup = X3D.querySelector('[DEF="WAYPOINTS"]');
+            waypointsURLs = {
+                    "1_0" : "https://mars.nasa.gov/news/8873/nasas-perseverance-rover-gives-high-definition-panoramic-view-of-landing-site/",
+                    "3_110" : "https://mars.nasa.gov/resources/25698/perseverance-drive-visualization/",
+                    "3_386" : "https://mars.nasa.gov/resources/25717/supercam-close-up-of-yeehgo-yeigo-target/",
+                    "3_578" : "http://www.unmannedspaceflight.com/index.php?showtopic=8608&view=findpost&p=250701",
+                    "3_770" : "http://www.unmannedspaceflight.com/index.php?showtopic=8608&view=findpost&p=250922",
+                    "3_792" : "http://www.unmannedspaceflight.com/index.php?s=&showtopic=8608&view=findpost&p=251095",
+                    "3_828" : "http://www.unmannedspaceflight.com/index.php?s=&showtopic=8608&view=findpost&p=251121"
+            };
             yScale = 5;
             yDatum = -2570;
             nPoints = 10;
@@ -237,6 +246,13 @@
             var props = f.properties;
             wp.setAttribute('location', fromLatLong(props).join());
             wp.setAttribute('text', `"sol ${props.sol}, drive ${props.drive}"`);
+            if (props.RMC in waypointsURLs)
+            {
+                var anchor = document.createElement('Anchor');
+                anchor.setAttribute('url', waypointsURLs[props.RMC]);
+                anchor.appendChild(wp);
+                return anchor
+            }
             return wp
         }
 
