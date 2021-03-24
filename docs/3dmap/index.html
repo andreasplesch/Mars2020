@@ -356,7 +356,7 @@
                 <div id='infoDiv' class="info info-font">X Y elevation</div>
                 <pre id='listDiv' class="list info-font">click to add points</pre>
                 <div class='small-font extra-info'>Equirectangular Mars 2000 Sphere projection</div>
-                <div id='attributions' class="small-font attribution">NASA/JPL-Caltech/Mars2020 HiRISE (c)2021 Andreas Plesch
+                <div id='attributions' class="small-font attribution">NASA/JPL-Caltech/Mars2020 HiRISE/T. Appéré (c)2021 Andreas Plesch
                 </div>
                 <div class='sliderbox'>
                     <input oninput="scaleY(this.value)" class='slider' type="range" id="yScale" name="yScale" step="0.1" min="1" max="9">
@@ -451,6 +451,14 @@
                             </Transform>
                         </ProtoBody>
                     </ProtoDeclare>
+                    <Background DEF='back1'
+                            bottomUrl='"background/512x512-000000ff.png"'
+                            topUrl='"background/py.jpg"'
+                            frontUrl='"background/nz.jpg"'
+                            backUrl='"background/pz.jpg"'
+                            leftUrl='"background/px.jpg"'
+                            rightUrl='"background/nx.jpg"'>
+                    </Background>
                     <DirectionalLight direction='-1, -0.5, -1' ambientintensity='1'></DirectionalLight>
                     <PointLight DEF='heliLight' location='4590885 6 -1093313' radius='4' ambientintensity='0'></PointLight>
                     <!-- physicalenvironmentlight diffuse="https://x3dom.org/download/assets/pbr/papermillDiffuse.dds"
