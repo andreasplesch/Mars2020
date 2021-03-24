@@ -42,6 +42,10 @@
                 left: 140px;
             }
 
+            .overlookbutton {
+                left: 218px;
+            }
+
             .info-font {
                 font-family: monospace;
                 font-size: large;
@@ -144,12 +148,13 @@
             waypointsGroup = X3D.querySelector('[DEF="WAYPOINTS"]');
             waypointsURLs = {
                     "1_0" : "https://mars.nasa.gov/news/8873/nasas-perseverance-rover-gives-high-definition-panoramic-view-of-landing-site/",
-                    "3_110" : "https://mars.nasa.gov/resources/25698/perseverance-drive-visualization/",
-                    "3_386" : "https://mars.nasa.gov/resources/25717/supercam-close-up-of-yeehgo-yeigo-target/",
-                    "3_578" : "http://www.unmannedspaceflight.com/index.php?showtopic=8608&view=findpost&p=250701",
-                    "3_770" : "http://www.unmannedspaceflight.com/index.php?showtopic=8608&view=findpost&p=250922",
-                    "3_792" : "http://www.unmannedspaceflight.com/index.php?s=&showtopic=8608&view=findpost&p=251095",
-                    "3_828" : "http://www.unmannedspaceflight.com/index.php?s=&showtopic=8608&view=findpost&p=251121"
+                    "3_110"  : "https://mars.nasa.gov/resources/25698/perseverance-drive-visualization/",
+                    "3_386"  : "https://mars.nasa.gov/resources/25717/supercam-close-up-of-yeehgo-yeigo-target/",
+                    "3_578"  : "http://www.unmannedspaceflight.com/index.php?showtopic=8608&view=findpost&p=250701",
+                    "3_770"  : "http://www.unmannedspaceflight.com/index.php?showtopic=8608&view=findpost&p=250922",
+                    "3_792"  : "http://www.unmannedspaceflight.com/index.php?s=&showtopic=8608&view=findpost&p=251095",
+                    "3_828"  : "http://www.unmannedspaceflight.com/index.php?s=&showtopic=8608&view=findpost&p=251121",
+                    "3_1266" : "https://mars.nasa.gov/news/8896/nasa-ingenuity-mars-helicopter-prepares-for-first-flight/"
             };
             yScale = 5;
             yDatum = -2570;
@@ -347,6 +352,7 @@
                 <button class="button resetbutton info-font" onclick='this.parentNode.runtime.resetView()'>RESET</button>
                 <button class="button mapbutton info-font" onclick='document.querySelector("#mapView").bind=true'>MAP</button>
                 <button class="button northbutton info-font" onclick='document.querySelector("#northView").bind=true'>NORTH</button>
+                <button class="button overlookbutton info-font" onclick='document.querySelector("#overlookView").bind=true'>OVERLOOK</button>
                 <div id='infoDiv' class="info info-font">X Y elevation</div>
                 <pre id='listDiv' class="list info-font">click to add points</pre>
                 <div class='small-font extra-info'>Equirectangular Mars 2000 Sphere projection</div>
@@ -446,17 +452,26 @@
                         </ProtoBody>
                     </ProtoDeclare>
                     <DirectionalLight direction='-1, -0.5, -1' ambientintensity='1'></DirectionalLight>
+                    <PointLight DEF='heliLight' location='4590885 6 -1093313' radius='4' ambientintensity='0'></PointLight>
+                    <!-- physicalenvironmentlight diffuse="https://x3dom.org/download/assets/pbr/papermillDiffuse.dds"
+                                          specular="https://x3dom.org/download/assets/pbr/papermillSpecular.dds">
+                    </physicalenvironmentlight -->
                     <Viewpoint id="mapView" position="4590876.63 312 -1093301.70" orientation="1 0 0 -1.57" centerOfRotation="4590876.63 0 -1093301.70" fieldOfView="0.52" description="Map view"></Viewpoint>
                     <Viewpoint id="northView" position="4590882.04816 121.70554 -1093125.99768" orientation="-0.99951 0.01929 -0.02464 0.67771" centerOfRotation="4590878 0 -1093299" fieldOfView="0.52" description="Perspective to N"></Viewpoint>
+                    <Viewpoint id="overlookView" position="4590991.71038 19.50146 -1093295.08286" orientation="-0.10388 0.99012 0.09414 1.40126" centerOfRotation="4590889.98806 0.59519 -1093313.59117" fieldOfView="0.52" description="Van Zyl Overlook"></Viewpoint>
                     <Transform id='scaleTrafo' scale='1 5 1'>
                         <Transform onmousemove='mousemove(event)' onclick='mouseclick(event)' id='posTrafo' translation='4590641.917 2570 -1093538.3776'>
                             <Inline url='M20_elevationgridA.x3d'></Inline>
                         </Transform>
                         <Transform DEF='WAYPOINTS' translation='0 2570 0'></Transform>
+                        <Transform DEF='SITES' translation='0 2570 0'>
+                                <WayPoint text='Airfield' color='0 0 0' location='4590886.71 -2570 -1093314.24'></WayPoint>
+                                <WayPoint text='Van Zyl Outlook' color='0 0 0' location='4590950.65 -2569 -1093302.40'></WayPoint>
+                        </Transform>
                     </Transform>
                     <Transform id='roverTrafo' DEF='roverTrafo' translation='4590877.8 0 -1093299.70' rotation='0 1 0 -2.29'>
                         <Transform id='roverInitTrafo' translation='0 0.5 0' rotation='0 1 0 3.1415'>
-                            <Inline namespacename='rover' url='https://raw.githubusercontent.com/andreasplesch/Library/gh-pages/Examples/Mars2020/Perseverance.glb'></Inline>
+                            <Inline namespacename='rover' url='Perseverance.glb'></Inline>
                         </Transform>
                         <Transform id='barTrafo' scale='.05 5 .05' translation='0 -5.0 0'>
                             <Shape>
@@ -466,6 +481,9 @@
                                 <Box></Box>
                             </Shape>
                         </Transform>
+                    </Transform>
+                    <Transform id='heliTrafo' DEF='heliTrafo' translation='4590886.71 3 -1093314.24' rotation='0 1 0 -2.29'>
+                            <Inline namespacename='heli' url='Ingenuity_v3.glb'></Inline>
                     </Transform>
                     <TimeSensor DEF='TS' loop='false' cycleInterval='20' enabled='true'></TimeSensor>
                     <PositionInterpolator DEF='PI' key='0 0.2 0.4 0.6 0.8 1' keyValue='
