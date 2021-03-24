@@ -312,6 +312,19 @@
             X3D.style.filter = `contrast(${c})`;
         }
 
+        function addBladeAnimation(inline) {
+                var aniContainer = document.createElement('group');
+                aniContainer.innerHTML = `
+<timesensor def="hts" loop="true" enabled="true" cycleinterval="0.3" first="true"></timesensor>
+<orientationinterpolator def="hOI1" key="0 0.5 1" keyvalue="1 0 0 0, 1 0 0 -3.14, 1 0 0 -6.28"></orientationinterpolator>
+<orientationinterpolator def="hOI2" key="0 0.5 1" keyvalue="1 0 0 0, 1 0 0  3.14, 1 0 0  6.28"></orientationinterpolator>
+<route fromnode="hts" fromfield="fraction_changed" tonode="hOI1" tofield="set_fraction"></route>
+<route fromnode="hOI1" fromfield="value_changed" tonode="glTF_NODE_rotors_01" tofield="set_rotation"></route>
+<route fromnode="hts" fromfield="fraction_changed" tonode="hOI2" tofield="set_fraction"></route>
+<route fromnode="hOI2" fromfield="value_changed" tonode="glTF_NODE_rotors_02" tofield="set_rotation"></route>`
+                inline.querySelector('transform').appendChild(aniContainer);
+        }
+
         // NOT USED
         function calcPanoTexCoords(grid, trafo, pos) {
             var xdim = grid.xDimension * 1.0;
@@ -491,7 +504,7 @@
                         </Transform>
                     </Transform>
                     <Transform id='heliTrafo' DEF='heliTrafo' translation='4590886.71 3 -1093314.24' rotation='0 1 0 -2.29'>
-                            <Inline namespacename='heli' url='Ingenuity_v3.glb'></Inline>
+                            <Inline onload='addBladeAnimation(this)' id='heliModel' namespacename='heli' url='Ingenuity_v3.glb'></Inline>
                     </Transform>
                     <TimeSensor DEF='TS' loop='false' cycleInterval='20' enabled='true'></TimeSensor>
                     <PositionInterpolator DEF='PI' key='0 0.2 0.4 0.6 0.8 1' keyValue='
