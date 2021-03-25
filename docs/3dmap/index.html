@@ -189,7 +189,11 @@
             ts.loop = true;
             var traverse = await (await fetch(TraverseURL)).json();
             traverse.features.sort((a, b) => 
-                parseInt(a.properties.toRMC.slice(2)) < parseInt(b.properties.toRMC.slice(2)) ? -1 : 1);
+                {
+                        var aRMC = a.properties.toRMC || "3_999999";
+                        var bRMC = b.properties.toRMC || "3_999999";
+                        return parseInt(aRMC.slice(2)) < parseInt(bRMC.slice(2)) ? -1 : 1;
+                });
             var pIntp = document.querySelector('[DEF=PI]');
             var coords = traverse.features.reduce((a,f)=>a.concat(f.geometry.coordinates), []);
             var key = coords.map((v,i)=>0.1 + 0.8 * i / (coords.length - 1));
