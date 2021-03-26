@@ -318,6 +318,29 @@
         }
 
         function addBladeAnimation(inline) {
+                var root = inline.querySelector('transform');
+                var rotor2 = inline.querySelector('[DEF=glTF_NODE_rotors_02]');//special treatment
+                rotor2.setAttribute('render','false');
+                rotor2.querySelectorAll('shape').forEach( function (c,i) 
+                {
+                        var defname = 'rotor2_shape_' + i;
+                        c.setAttribute('DEF', defname);
+                        //manually add to defMap since adding DEF is not supported
+                        var node = c._x3domNode;
+                        node._DEF = defname;
+                        node._nameSpace.defMap[defname] = node;
+                } );
+                var rot2trafo = document.createElement('Transform');
+                rot2trafo.setAttribute('DEF', 'rotor2Trafo');
+                // need to clone node this way since x3dom has problems moving the rotor2 DOM node.
+                rot2trafo.innerHTML = `
+<Transform DEF='glTF_NODE_rotors_02_ghost' translation='${rotor2.translation}' rotation='${rotor2.rotation}' scale='${rotor2.scale}'>
+  <Shape USE='rotor2_shape_0'></Shape>
+  <Shape USE='rotor2_shape_1'></Shape>
+  <Shape USE='rotor2_shape_2'></Shape>
+  <Shape USE='rotor2_shape_3'></Shape>
+</Transform>`;
+                root.appendChild(rot2trafo);
                 var aniContainer = document.createElement('group');
                 aniContainer.innerHTML = `
 <timesensor def="hts" loop="true" enabled="true" cycleinterval="0.3" first="true"></timesensor>
@@ -326,8 +349,8 @@
 <route fromnode="hts" fromfield="fraction_changed" tonode="hOI1" tofield="set_fraction"></route>
 <route fromnode="hOI1" fromfield="value_changed" tonode="glTF_NODE_rotors_01" tofield="set_rotation"></route>
 <route fromnode="hts" fromfield="fraction_changed" tonode="hOI2" tofield="set_fraction"></route>
-<route fromnode="hOI2" fromfield="value_changed" tonode="glTF_NODE_rotors_02" tofield="set_rotation"></route>`
-                inline.querySelector('transform').appendChild(aniContainer);
+<route fromnode="hOI2" fromfield="value_changed" tonode="rotor2Trafo" tofield="set_rotation"></route>`
+                root.appendChild(aniContainer);
         }
 
         // NOT USED
@@ -508,7 +531,7 @@
                             </Shape>
                         </Transform>
                     </Transform>
-                    <Transform id='heliTrafo' DEF='heliTrafo' translation='4590886.71 3 -1093314.24' rotation='0 1 0 -2.29'>
+                    <Transform id='heliTrafo' DEF='heliTrafo' translation='4590887.71 4 -1093314.24' rotation='0 1 0 -2.29'>
                             <Inline onload='addBladeAnimation(this)' id='heliModel' namespacename='heli' url='Ingenuity_v3.glb'></Inline>
                     </Transform>
                     <TimeSensor DEF='TS' loop='false' cycleInterval='20' enabled='true'></TimeSensor>
