@@ -185,6 +185,7 @@
         }
 
         async function initAnimation() {
+            var prec = 4; // precision for interpolators
             var ts = document.querySelector('[DEF=TS]');
             ts.cycleInterval = CycleInterval;
             ts.loop = true;
@@ -197,7 +198,7 @@
                 });
             var pIntp = document.querySelector('[DEF=PI]');
             var coords = traverse.features.reduce((a,f)=>a.concat(f.geometry.coordinates), []);
-            var key = coords.map((v,i)=>0.1 + 0.8 * i / (coords.length - 1));
+            var key = coords.map((v,i)=>(0.1 + 0.8 * i / (coords.length - 1)).toFixed(prec));
             key.unshift(0);
             key.push(1);
             var keyValue = coords.map(v=>{
@@ -205,7 +206,7 @@
                     lon: v[0],
                     lat: v[1],
                     elev_geoid: 1.0 * yScale
-                })
+                }).map( v => v.toFixed(2) )
             }
             );
             keyValue.unshift(keyValue[0]);
@@ -227,7 +228,7 @@
                 });
                 var dx = xyz1[0] - xyz0[0];
                 var dy = xyz1[2] - xyz0[2];
-                return [0, 1, 0, -Math.atan2(dy, dx) - Math.PI / 2]
+                return [0, 1, 0, (-Math.atan2(dy, dx) - Math.PI / 2).toFixed(prec)]
             }
             );
             keyValue.unshift(keyValue[0]);
@@ -351,6 +352,11 @@
 <route fromnode="hts" fromfield="fraction_changed" tonode="hOI2" tofield="set_fraction"></route>
 <route fromnode="hOI2" fromfield="value_changed" tonode="rotor2Trafo" tofield="set_rotation"></route>`
                 root.appendChild(aniContainer);
+        }
+
+        function modDEM (inline) {
+                var material = inline.querySelector('Material');
+                material.setAttribute('ambientintensity', '2.3');
         }
 
         // NOT USED
@@ -500,7 +506,7 @@
                             leftUrl='"background/px.jpg"'
                             rightUrl='"background/nx.jpg"'>
                     </Background>
-                    <DirectionalLight direction='-1, -0.5, -1' ambientintensity='1'></DirectionalLight>
+                    <DirectionalLight direction='-1, -0.5, -1' ambientintensity='0.4'></DirectionalLight>
                     <PointLight DEF='heliLight' location='4590885 6 -1093313' radius='4' ambientintensity='0'></PointLight>
                     <!-- physicalenvironmentlight diffuse="https://x3dom.org/download/assets/pbr/papermillDiffuse.dds"
                                           specular="https://x3dom.org/download/assets/pbr/papermillSpecular.dds">
@@ -510,7 +516,7 @@
                     <Viewpoint id="overlookView" position="4590991.71038 19.50146 -1093295.08286" orientation="-0.10388 0.99012 0.09414 1.40126" centerOfRotation="4590889.98806 0.59519 -1093313.59117" fieldOfView="0.52" description="Van Zyl Overlook"></Viewpoint>
                     <Transform id='scaleTrafo' scale='1 5 1'>
                         <Transform onmousemove='mousemove(event)' onclick='mouseclick(event)' id='posTrafo' translation='4590641.917 2570 -1093538.3776'>
-                            <Inline url='M20_elevationgridA.x3d'></Inline>
+                            <Inline onload='modDEM(this)' namespacename='dem' url='M20_elevationgridA.x3d'></Inline>
                         </Transform>
                         <Transform DEF='WAYPOINTS' translation='0 2570 0'></Transform>
                         <Transform DEF='SITES' translation='0 2570 0'>
