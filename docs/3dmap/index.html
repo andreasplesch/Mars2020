@@ -356,7 +356,7 @@
 
         function modDEM (inline) {
                 var material = inline.querySelector('Material');
-                material.setAttribute('ambientintensity', '2.3');
+                material.setAttribute('ambientintensity', '2.1');
         }
 
         // NOT USED
@@ -520,8 +520,27 @@
                         </Transform>
                         <Transform DEF='WAYPOINTS' translation='0 2570 0'></Transform>
                         <Transform DEF='SITES' translation='0 2570 0'>
+                        <!--
                                 <WayPoint text='Airfield' color='0 0 0' location='4590886.71 -2570 -1093314.24'></WayPoint>
+                        -->
                                 <WayPoint text='Van Zyl Overlook' color='0 0 0' location='4590950.65 -2569 -1093302.40'></WayPoint>
+                        </Transform>
+                        <Transform DEF='FlightZone' translation='4590869.6 0 -1093372.5'>
+                                <Shape>
+                                        <!-- be sure to order cross-section points so that normal is upward -->
+                                        <Extrusion solid='false' crossSection='
+0.0,0.0 0.0,-1.4 0.2,-2.9 0.5,-4.3 0.9,-5.7 1.5,-7.1 2.2,-8.3 3.1,-9.5 4.1,-10.6 5.2,-11.6 6.3,-12.5 7.6,-13.2 9.0,-13.8 10.3,-14.3 11.8,-14.6 13.2,-14.7 14.7,-14.7 16.2,-14.6 17.6,-14.3 19.0,-13.8 20.3,-13.2 21.6,-12.5 22.8,-11.6 23.9,-10.7 24.9,-9.6 25.7,-8.4 26.5,-7.1 27.1,-5.8 27.5,-4.4 27.8,-3.0 28.0,-1.5 31.2,58.0 31.2,59.4 31.1,60.9 30.8,62.3 30.3,63.7 29.7,65.1 29.0,66.3 28.2,67.5 27.2,68.6 26.1,69.6 24.9,70.5 23.6,71.2 22.3,71.8 20.9,72.3 19.5,72.6 18.0,72.7 16.6,72.7 15.1,72.6 13.7,72.3 12.3,71.8 10.9,71.2 9.7,70.5 8.5,69.6 7.4,68.7 6.4,67.6 5.5,66.4 4.8,65.1 4.2,63.8 3.7,62.4 3.4,61.0 3.3,59.5 0.0,0.0                                        ' 
+                                                spine='0 0 0, 0 5 0'
+                                                beginCap = 'false' endCap = 'false'
+                                                >
+                                        <!-- spine is open, crossSection is closed -->
+                                        </Extrusion>
+                                        <Appearance>
+                                                <Material transparency='0.8' ambientIntensity='0.1'
+                                                diffuseColor='0.2 0.6 0.5' emissiveColor='0.2 0.6 0.5'>
+                                                </Material>
+                                        </Appearance>
+                                </Shape>
                         </Transform>
                     </Transform>
                     <Transform id='roverTrafo' DEF='roverTrafo' translation='4590877.8 0 -1093299.70' rotation='0 1 0 -2.29'>
