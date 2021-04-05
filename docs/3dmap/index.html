@@ -147,7 +147,7 @@
             roverInitTrafo = X3D.querySelector('#roverInitTrafo');
             waypointsGroup = X3D.querySelector('[DEF="WAYPOINTS"]');
             waypointsURLs = {
-                    "1_0" : "https://mars.nasa.gov/news/8873/nasas-perseverance-rover-gives-high-definition-panoramic-view-of-landing-site/",
+                    "3_0"    : "https://mars.nasa.gov/news/8873/nasas-perseverance-rover-gives-high-definition-panoramic-view-of-landing-site/",
                     "3_110"  : "https://mars.nasa.gov/resources/25698/perseverance-drive-visualization/",
                     "3_386"  : "https://mars.nasa.gov/resources/25717/supercam-close-up-of-yeehgo-yeigo-target/",
                     "3_578"  : "http://www.unmannedspaceflight.com/index.php?showtopic=8608&view=findpost&p=250701",
@@ -155,7 +155,13 @@
                     "3_792"  : "http://www.unmannedspaceflight.com/index.php?s=&showtopic=8608&view=findpost&p=251095",
                     "3_828"  : "http://www.unmannedspaceflight.com/index.php?s=&showtopic=8608&view=findpost&p=251121",
                     "3_1266" : "https://mars.nasa.gov/news/8896/nasa-ingenuity-mars-helicopter-prepares-for-first-flight/",
-                    "3_1374" : "http://www.unmannedspaceflight.com/index.php?s=&showtopic=8608&view=findpost&p=251190"
+                    "3_1374" : "http://www.unmannedspaceflight.com/index.php?s=&showtopic=8608&view=findpost&p=251190",
+                    "3_1392" : "http://www.unmannedspaceflight.com/index.php?s=&showtopic=8610&view=findpost&p=251376",
+                    "3_1398" : "http://www.unmannedspaceflight.com/index.php?s=&showtopic=8608&view=findpost&p=251367"
+            };
+            waypointsSizes = {
+                    "3_1398" : 0.3,
+                    "3_1416" : 0.3
             };
             yScale = 5;
             yDatum = -2570;
@@ -246,7 +252,7 @@
         }
 
         function addWaypoints() {
-            fetch(All_WaypointsURL).then(response=>('json'in response) ? response.json() : console.warn(response)).then(waypoints=>{
+            fetch(All_WaypointsURL).then(response=>('json' in response) ? response.json() : console.warn(response)).then(waypoints=>{
                 waypoints.features.forEach(f=>waypointsGroup.appendChild(wpFromFeature(f)));
             }
             );
@@ -257,6 +263,11 @@
             var props = f.properties;
             wp.setAttribute('location', fromLatLong(props).join());
             wp.setAttribute('text', `"sol ${props.sol}, drive ${props.drive}"`);
+            if (props.RMC in waypointsSizes)
+            {
+                wp.setAttribute('radius', waypointsSizes[props.RMC]);
+                wp.setAttribute('textSize', waypointsSizes[props.RMC]);    
+            };
             if (props.RMC in waypointsURLs)
             {
                 var anchor = document.createElement('Anchor');
@@ -417,70 +428,50 @@
                     <Environment id="gamma" gammaCorrectionDefault="none"></Environment>
                     <NavigationInfo headlight='false' type='"EXAMINE"' explorationMode='-rotate'></NavigationInfo>
                     <WorldInfo title='animated Mars Rover Perserverance Map'></WorldInfo>
-                    <ProtoDeclare name='WayPointText'>
-                        <ProtoInterface>
-                            <field name='offset' type='SFVec3f' value='0 0 0' accessType='inputOutput'></field>
-                            <field name='string' type='MFString' accessType='inputOutput'></field>
-                            <field name='size' type='SFFloat' value='1.0' accessType='initializeOnly'></field>
-                            <field name='color' type='SFColor' value='0.2 0.6 1' accessType='inputOutput'></field>
-                            <field name='justify' type='MFString' value='"MIDDLE" "MIDDLE"' accessType='initializeOnly'></field>
-                            <field name='style' type='SFString' value='PLAIN' accessType='initializeOnly'></field>
-                            <field name='family' type='MFString' value='"SERIF"' accessType='initializeOnly'></field>
-                        </ProtoInterface>
-                        <ProtoBody>
-                            <Transform rotation='1 0 0 -1.57'>
-                                <IS>
-                                    <connect nodeField='translation' protoField='offset'></connect>
-                                </IS>
-                                <Shape>
-                                    <Appearance>
-                                        <Material>
-                                            <IS>
-                                                <connect nodeField='diffuseColor' protoField='color'></connect>
-                                            </IS>
-                                        </Material>
-                                    </Appearance>
-                                    <Text solid='false'>
-                                        <IS>
-                                            <connect nodeField='string' protoField='string'></connect>
-                                        </IS>
-                                        <FontStyle>
-                                            <IS>
-                                                <connect nodeField='family' protoField='family'></connect>
-                                                <connect nodeField='justify' protoField='justify'></connect>
-                                                <connect nodeField='size' protoField='size'></connect>
-                                                <connect nodeField='style' protoField='style'></connect>
-                                            </IS>
-                                        </FontStyle>
-                                    </Text>
-                                </Shape>
-                            </Transform>
-                        </ProtoBody>
-                    </ProtoDeclare>
                     <ProtoDeclare name='WayPoint'>
                         <ProtoInterface>
                             <field name='location' type='SFVec3f' value='0 0 0' accessType='inputOutput'></field>
                             <field name='textOffset' type='SFVec3f' value='1 1 -1' accessType='inputOutput'></field>
                             <field name='text' type='MFString' accessType='inputOutput'></field>
-                            <field name='size' type='SFFloat' value='1.0' accessType='initializeOnly'></field>
+                            <field name='radius' type='SFFloat' value='1.0' accessType='initializeOnly'></field>
+                            <field name='textSize' type='SFFloat' value='1.0' accessType='initializeOnly'></field>
                             <field name='color' type='SFColor' value='0.2 0.6 1' accessType='inputOutput'></field>
+                            <field name='justify' type='MFString' value='"BEGIN" "MIDDLE"' accessType='initializeOnly'></field>
+                            <field name='style' type='SFString' value='BOLD' accessType='initializeOnly'></field>
+                            <field name='family' type='MFString' value='"SERIF"' accessType='initializeOnly'></field>
                         </ProtoInterface>
                         <ProtoBody>
                             <Transform>
                                 <IS>
                                     <connect nodeField='translation' protoField='location'></connect>
                                 </IS>
-                                <WayPointText style='BOLD' justify='"BEGIN" "END"'>
-                                    <IS>
-                                        <connect nodeField='offset' protoField='textOffset'></connect>
-                                    </IS>
-                                    <IS>
-                                        <connect nodeField='string' protoField='text'></connect>
-                                    </IS>
-                                    <IS>
-                                        <connect nodeField='color' protoField='color'></connect>
-                                    </IS>
-                                </WayPointText>
+                                <Transform rotation='1 0 0 -1.57'>
+                                <IS>
+                                    <connect nodeField='translation' protoField='textOffset'></connect>
+                                </IS>
+                                        <Shape>
+                                            <Appearance>
+                                                <Material>
+                                                    <IS>
+                                                        <connect nodeField='diffuseColor' protoField='color'></connect>
+                                                    </IS>
+                                                </Material>
+                                            </Appearance>
+                                            <Text solid='false'>
+                                                <IS>
+                                                    <connect nodeField='string' protoField='text'></connect>
+                                                </IS>
+                                                <FontStyle>
+                                                    <IS>
+                                                        <connect nodeField='family' protoField='family'></connect>
+                                                        <connect nodeField='justify' protoField='justify'></connect>
+                                                        <connect nodeField='size' protoField='textSize'></connect>
+                                                        <connect nodeField='style' protoField='style'></connect>
+                                                    </IS>
+                                                </FontStyle>
+                                            </Text>
+                                        </Shape>
+                                </Transform>
                                 <Shape>
                                     <Appearance>
                                         <Material transparency='0.8'>
@@ -489,9 +480,9 @@
                                             </IS>
                                         </Material>
                                     </Appearance>
-                                    <Sphere>
+                                    <Sphere usegeocache='false'>
                                         <IS>
-                                            <connect nodeField='radius' protoField='size'></connect>
+                                            <connect nodeField='radius' protoField='radius'></connect>
                                         </IS>
                                     </Sphere>
                                 </Shape>
@@ -507,7 +498,7 @@
                             rightUrl='"background/nx.jpg"'>
                     </Background>
                     <DirectionalLight direction='-1, -0.5, -1' ambientintensity='0.4'></DirectionalLight>
-                    <PointLight DEF='heliLight' location='4590885 6 -1093313' radius='4' ambientintensity='0'></PointLight>
+                    <PointLight DEF='heliLight' location='4590883 6 -1093313' radius='4' ambientintensity='0'></PointLight>
                     <!-- physicalenvironmentlight diffuse="https://x3dom.org/download/assets/pbr/papermillDiffuse.dds"
                                           specular="https://x3dom.org/download/assets/pbr/papermillSpecular.dds">
                     </physicalenvironmentlight -->
@@ -543,7 +534,7 @@
                                 </Shape>
                         </Transform>
                     </Transform>
-                    <Transform id='roverTrafo' DEF='roverTrafo' translation='4590877.8 0 -1093299.70' rotation='0 1 0 -2.29'>
+                    <Transform id='roverTrafo' DEF='roverTrafo' translation='4590876.63 0 -1093299.70' rotation='0 1 0 -2.29'>
                         <Transform id='roverInitTrafo' translation='0 0.5 0' rotation='0 1 0 3.1415'>
                             <Inline namespacename='rover' url='Perseverance.glb'></Inline>
                         </Transform>
@@ -556,7 +547,7 @@
                             </Shape>
                         </Transform>
                     </Transform>
-                    <Transform id='heliTrafo' DEF='heliTrafo' translation='4590887.71 4 -1093314.24' rotation='0 1 0 -2.29'>
+                    <Transform id='heliTrafo' DEF='heliTrafo' translation='4590885.87,4,-1093313.659' rotation='0 1 0 -2.29'>
                             <Inline onload='addBladeAnimation(this)' id='heliModel' namespacename='heli' url='Ingenuity_v3.glb'></Inline>
                     </Transform>
                     <TimeSensor DEF='TS' loop='false' cycleInterval='20' enabled='true'></TimeSensor>
