@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 190.54999 363.18033">
+  <defs>
+    <linearGradient id="c">
+      <stop offset="0" stop-color="#fff"/>
+      <stop offset="1" stop-color="#333"/>
+    </linearGradient>
+    <linearGradient id="b">
+      <stop offset="0" stop-color="#b3b3eb" stop-opacity="0"/>
+      <stop offset="1"/>
+    </linearGradient>
+    <linearGradient id="a">
+      <stop offset="0" stop-color="#333"/>
+      <stop offset="1" stop-color="#fff"/>
+    </linearGradient>
+    <linearGradient id="k" x1="193.62866" x2="193.62814" y1="161.64732" y2="162.41747" gradientTransform="scale(.66368 1.50674)" gradientUnits="userSpaceOnUse" spreadMethod="reflect" xlink:href="#a"/>
+    <linearGradient id="d">
+      <stop offset="0" stop-color="#b3b3eb" stop-opacity="0"/>
+      <stop offset="1"/>
+    </linearGradient>
+    <linearGradient id="e">
+      <stop offset="0" stop-color="#fff"/>
+      <stop offset="1" stop-color="#333"/>
+    </linearGradient>
+    <linearGradient id="f">
+      <stop offset="0" stop-color="#b3b3eb" stop-opacity="0"/>
+      <stop offset="1"/>
+    </linearGradient>
+    <linearGradient id="g">
+      <stop offset="0" stop-color="#fff"/>
+      <stop offset="1" stop-color="#333"/>
+    </linearGradient>
+    <linearGradient id="h">
+      <stop offset="0" stop-color="#b3b3eb" stop-opacity="0"/>
+      <stop offset="1"/>
+    </linearGradient>
+    <radialGradient id="l" cx="158.02565" cy="169.19684" r="31.162628" fx="158.02565" fy="169.19684" gradientTransform="scale(.66804 1.49692)" gradientUnits="userSpaceOnUse" spreadMethod="reflect" xlink:href="#b"/>
+    <radialGradient id="i" cx="85.527977" cy="170.14417" r="252.08325" fx="85.527977" fy="170.14417" gradientTransform="matrix(.72965 0 0 1.37052 -22.308518 -160.31036)" gradientUnits="userSpaceOnUse" spreadMethod="reflect" xlink:href="#c"/>
+    <radialGradient id="j" cx="193.40065" cy="181.62012" r="68.141403" fx="193.40065" fy="181.62012" gradientTransform="scale(.67783 1.47529)" gradientUnits="userSpaceOnUse" spreadMethod="reflect" xlink:href="#c"/>
+  </defs>
+  <path fill="url(#i)" fill-rule="evenodd" stroke="#000" stroke-width="1.12500405" d="M95.287282 352.61784c-73.23963 0-84.31263-65.0183-83.55509-85.6175h0c1.12756-19.4293 2.06543-97.586-1.16969-163.3972.82433-71.924098 55.77251-70.204898 84.71258-70.204898 28.939898 0 83.888098-1.7192 84.712398 70.204898-3.2351 65.8112-2.2972 143.9679-1.1697 163.393h0c.7576 20.5992-10.3154 85.6175-83.554998 85.6175" font-size="12"/>
+  <path fill="url(#j)" fill-rule="evenodd" d="M133.75 254.93353a15.9375 34.6875 0 11-31.875 0 15.9375 34.6875 0 1131.875 0z" transform="matrix(.9804 0 0 1.24324 -20.310969 -222.63372)"/>
+  <path fill="none" stroke="#000" stroke-width="1.25" d="M95.264882 33.822042V152.40024" font-size="12"/>
+  <path fill="url(#k)" fill-rule="evenodd" d="M129.375 257.12103a11.5625 26.25 0 11-23.125 0 11.5625 26.25 0 1123.125 0z" transform="translate(-22.308518 -163.43538)"/>
+  <path fill="url(#l)" fill-rule="evenodd" stroke="#000" stroke-width=".55000001" d="M129.375 257.12103a11.5625 26.25 0 11-23.125 0 11.5625 26.25 0 1123.125 0z" transform="translate(-22.308518 -163.43538)"/>
+  <path fill="none" stroke="#000" stroke-linecap="round" stroke-width="1.25" d="M95.049082 152.34074c-82.34601 0-80.16141 3.297-82.62234 3.922"/>
+  <path fill="none" stroke="#000" stroke-linecap="round" stroke-width="1.25" d="M95.264882 152.33744c83.169398 0 82.881998 4.6673 82.881998 4.6673" font-size="12"/>
+  <path fill="#ffa507" fill-opacity=".64171125" fill-rule="evenodd" d="M107.130844 93.71646a11.5625 26.25 0 11-23.125 0 11.5625 26.25 0 1123.125 0z"/>
+  <path fill="#ffa507" fill-opacity=".93582889" stroke="#000" stroke-opacity=".55080213" d="M95.154168 10.5L84.71927 30.087727h5.170724v34.446622h10.921596V30.087727h4.77748L95.154168 10.5z"/>
+  <path fill="#ffa507" fill-opacity=".9372549" stroke="#000" stroke-opacity=".54901961" d="M94.574273 175.86646l-10.434898-19.58773h5.170724v-34.44662H100.2317v34.44662h4.77748l-10.434907 19.58773z"/>
+</svg>
