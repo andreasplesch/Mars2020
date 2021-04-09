@@ -112,7 +112,35 @@
                 margin-right: 4px;
                 background: rgb(165 165 165 / 20%);
                 padding: 5px;
+            }
+
+            .contrast {
+                bottom: 50px;
+            }
+
+            .help {
                 top: 5px;
+            }
+
+            .helpText {
+                display: none;
+                background: rgb(0 42 78 / 31%);
+                padding: 10px;
+            }
+
+            .helpList {
+                list-style-type: none;
+                padding: 0px;
+                margin: 0px;
+            }
+
+            .mouseSVG {
+                    width: 20px;
+                    vertical-align: middle;
+            }
+
+            #help:checked ~ .helpText {
+                    display: block
             }
 
             .slider {
@@ -158,7 +186,8 @@
                     "3_1374" : "http://www.unmannedspaceflight.com/index.php?s=&showtopic=8608&view=findpost&p=251190",
                     "3_1392" : "http://www.unmannedspaceflight.com/index.php?s=&showtopic=8610&view=findpost&p=251389",
                     "3_1398" : "http://www.unmannedspaceflight.com/index.php?s=&showtopic=8608&view=findpost&p=251367",
-                    "3_1416" : "http://www.unmannedspaceflight.com/index.php?s=&showtopic=8608&view=findpost&p=251437"
+                    "3_1416" : "http://www.unmannedspaceflight.com/index.php?s=&showtopic=8608&view=findpost&p=251437",
+                    "3_1708" :"http://www.unmannedspaceflight.com/index.php?s=&showtopic=8608&view=findpost&p=251494"
             };
             waypointsSizes = {
                     "3_1398" : 0.3,
@@ -421,9 +450,27 @@
                     <input oninput="scaleY(this.value)" class='slider' type="range" id="yScale" name="yScale" step="0.1" min="1" max="9">
                     <label class='small-font sliderlabel' for="yScale">5.0 x v.e.</label>
                 </div>
-                <div class='atright'>
+                <div class='atright contrast'>
                     <input oninput="contrast(this.value)" class='slider' type="range" id="contrast" name="contrast" step="0.01" min="0" max="3">
                     <label class='small-font sliderlabel' for="contrast">1.50 contrast</label>
+                </div>
+                <div class='atright help'>
+                    <input type="checkbox" id="help" name="help">
+                    <label class='small-font' for="help">help</label>
+                    <div class="helpText info-font">
+                        <ul class='helpList'>
+                            <li>
+                                <img class="mouseSVG" src="media/Mouse_1.svg"></img>
+                                double click to recenter
+                            </li>
+                            <li>
+                                <img class="mouseSVG" src="media/Mouse_2.svg"></img>
+                                right drag or wheel to zoom</li>
+                            <li>
+                                <img class="mouseSVG" src="media/Mouse_3_Scroll.svg"></img>
+                                middle drag to pan</li>
+                        </ul>
+                    </div>
                 </div>
                 <Scene>
                     <Environment id="gamma" gammaCorrectionDefault="none"></Environment>
@@ -504,7 +551,7 @@
                                           specular="https://x3dom.org/download/assets/pbr/papermillSpecular.dds">
                     </physicalenvironmentlight -->
                     <Viewpoint id="mapView" position="4590884 136 -1093313" orientation="1 0 0 -1.57" centerOfRotation="4590884 0 -1093314" fieldOfView="0.52" description="Map view"></Viewpoint>
-                    <Viewpoint id="northView" position="4590882.04816 121.70554 -1093125.99768" orientation="-0.99951 0.01929 -0.02464 0.67771" centerOfRotation="4590878 0 -1093299" fieldOfView="0.52" description="Perspective to N"></Viewpoint>
+                    <Viewpoint id="northView" position="4590891 72 -1093226" orientation="-0.99951 0.01929 -0.02464 0.67771" centerOfRotation="4590889 4 -1093301" fieldOfView="0.52" description="Perspective to N"></Viewpoint>
                     <Viewpoint id="overlookView" position="4590991.71038 19.50146 -1093295.08286" orientation="-0.10388 0.99012 0.09414 1.40126" centerOfRotation="4590889.98806 0.59519 -1093313.59117" fieldOfView="0.52" description="Van Zyl Overlook"></Viewpoint>
                     <Transform id='scaleTrafo' scale='1 5 1'>
                         <Transform onmousemove='mousemove(event)' onclick='mouseclick(event)' id='posTrafo' translation='4590641.917 2570 -1093538.3776'>
@@ -536,8 +583,10 @@
                         </Transform>
                     </Transform>
                     <Transform id='roverTrafo' DEF='roverTrafo' translation='4590876.63 0 -1093299.70' rotation='0 1 0 -2.29'>
-                        <Transform id='roverInitTrafo' translation='0 0.5 0' rotation='0 1 0 3.1415'>
-                            <Inline namespacename='rover' url='Perseverance.glb'></Inline>
+                        <Transform id='roverInitTrafo2' translation='0 0 0' _rotation='0 1 0 1.57' rotation='0 1 0 0'>
+                        <Transform id='roverInitTrafo' translation='0 0.5 0' _rotation='1 0 0 1.57' rotation='0 1 0 3.1415'>
+                            <Inline namespacename='rover' _url='Perseverance_v2.glb' url='Perseverance.glb'></Inline>
+                        </Transform>
                         </Transform>
                         <Transform id='barTrafo' scale='.05 5 .05' translation='0 -5.0 0'>
                             <Shape>
