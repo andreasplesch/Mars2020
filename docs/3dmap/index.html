@@ -212,8 +212,8 @@
             TraverseURL = "https://mars.nasa.gov/mmgis-maps/M20/Layers/json/M20_traverse.json";
             //seconds
             CycleInterval = 20;
-            initAnimation();
-            addWaypoints();
+            initWaypointsandAnimation();
+            //addWaypoints();
 
             //<TextureCoordinate point="0 0 1 1"></TextureCoordinate>
             //zDimension='452' xSpacing='1.000162168140152241' zDimension='452' zSpacing='1.000774557521954211'
@@ -222,7 +222,16 @@
 
         }
 
-        async function initAnimation() {
+        async function initWaypointsandAnimation() {
+            var waypointsResponse = await fetch(All_WaypointsURL);
+            var waypoints;
+            if ('json' in waypointsResponse )
+            {
+                waypoints = await waypointsResponse.json();
+                waypoints.features.forEach(f=>waypointsGroup.appendChild(wpFromFeature(f)));
+            }
+            else { console.warn(waypointsResponse) };
+            
             var prec = 4; // precision for interpolators
             var ts = document.querySelector('[DEF=TS]');
             ts.cycleInterval = CycleInterval;
@@ -230,13 +239,16 @@
             var traverse = await (await fetch(TraverseURL)).json();
             traverse.features.sort((a, b) => 
                 {
-                        var aRMC = a.properties.toRMC || "3_999999";
-                        var bRMC = b.properties.toRMC || "3_999999";
-                        return parseInt(aRMC.slice(2)) < parseInt(bRMC.slice(2)) ? -1 : 1;
+                    var aLength = a.properties.length;// || "3_999999";
+                    var bLength = b.properties.length;// || "3_999999";
+                    var aIndex = waypoints.features.findIndex( f => f.properties.dist_m == aLength );
+                    var bIndex = waypoints.features.findIndex( f => f.properties.dist_m == bLength );                       
+                    return aIndex < bIndex ? -1: 1; 
+                    //parseInt(aRMC.slice(2)) < parseInt(bRMC.slice(2)) ? -1 : 1;
                 });
             var pIntp = document.querySelector('[DEF=PI]');
-            var coords = traverse.features.reduce((a,f)=>a.concat(f.geometry.coordinates), []);
-            var key = coords.map((v,i)=>(0.1 + 0.8 * i / (coords.length - 1)).toFixed(prec));
+            var coords = traverse.features.reduce((a, f)=>a.concat(f.geometry.coordinates), []);
+            var key = coords.map((v, i)=>(0.1 + 0.8 * i / (coords.length - 1)).toFixed(prec));
             key.unshift(0);
             key.push(1);
             var keyValue = coords.map(v=>{
@@ -283,12 +295,12 @@
             //map2trueEasting = Math.cos(waypoints.features[0].geometry.coordinates[1] * deg2rad);
         }
 
-        function addWaypoints() {
-            fetch(All_WaypointsURL).then(response=>('json' in response) ? response.json() : console.warn(response)).then(waypoints=>{
-                waypoints.features.forEach(f=>waypointsGroup.appendChild(wpFromFeature(f)));
-            }
-            );
-        }
+//         function addWaypoints() {
+//             fetch(All_WaypointsURL).then(response=>('json' in response) ? response.json() : console.warn(response)).then(waypoints=>{
+//                 waypoints.features.forEach(f=>waypointsGroup.appendChild(wpFromFeature(f)));
+//             }
+//             );
+//         }
 
         function wpFromFeature(f) {
             var wp = document.createElement('WayPoint');
