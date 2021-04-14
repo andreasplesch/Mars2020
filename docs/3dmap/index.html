@@ -239,10 +239,13 @@
             var traverse = await (await fetch(TraverseURL)).json();
             traverse.features.sort((a, b) => 
                 {
-                    var aLength = a.properties.length;// || "3_999999";
+                    var eps = 0.01;
+                    var aLength = a.properties.length;// 0.0 means last // || "3_999999";
+                    if (aLength == 0) { return 1 };
                     var bLength = b.properties.length;// || "3_999999";
-                    var aIndex = waypoints.features.findIndex( f => f.properties.dist_m == aLength );
-                    var bIndex = waypoints.features.findIndex( f => f.properties.dist_m == bLength );                       
+                    if (bLength == 0) { return -1 };
+                    var aIndex = waypoints.features.findIndex( f => Math.abs( f.properties.dist_m - aLength ) < eps );
+                    var bIndex = waypoints.features.findIndex( f => Math.abs( f.properties.dist_m - bLength ) < eps );                       
                     return aIndex < bIndex ? -1: 1; 
                     //parseInt(aRMC.slice(2)) < parseInt(bRMC.slice(2)) ? -1 : 1;
                 });
