@@ -189,7 +189,8 @@
                     "3_1416" : "http://www.unmannedspaceflight.com/index.php?s=&showtopic=8608&view=findpost&p=251437",
                     "3_1708" : "http://www.unmannedspaceflight.com/index.php?s=&showtopic=8608&view=findpost&p=251494",
                     "3_1850" : "https://mars.nasa.gov/resources/25796/ingenuity-begins-to-spin-its-blades/",
-                    "3_1950" : "http://www.unmannedspaceflight.com/index.php?s=&showtopic=8608&view=findpost&p=251540"
+                    "3_1950" : "http://www.unmannedspaceflight.com/index.php?s=&showtopic=8608&view=findpost&p=251540",
+                    "3_2046" : "https://mars.nasa.gov/resources/25828/first-video-of-nasas-ingenuity-mars-helicopter-in-flight/"
             };
             waypointsSizes = {
                     "3_1398" : 0.3,
@@ -576,10 +577,10 @@
                         </Transform>
                         <Transform DEF='WAYPOINTS' translation='0 2570 0'></Transform>
                         <Transform DEF='SITES' translation='0 2570 0'>
-                        <!--
-                                <WayPoint text='Airfield' color='0 0 0' location='4590886.71 -2570 -1093314.24'></WayPoint>
-                        -->
-                                <WayPoint text='Van Zyl Overlook' color='0 0 0' location='4590950.65 -2569 -1093302.40'></WayPoint>
+                        
+                                <WayPoint text='Wright Brother Field' color='0 0 0' radius='0.2' textOffset='1 1 -1' location='4590884 -2570 -1093315.24'></WayPoint>
+                        
+                                <WayPoint text='Van Zyl Overlook' color='0 0 0' radius='0.2' textOffset='1 1 1' location='4590952.15 -2569 -1093307.40'></WayPoint>
                         </Transform>
                         <Transform DEF='FlightZone' translation='4590869.6 0 -1093372.5'>
                                 <Shape>
@@ -617,6 +618,19 @@
                     <Transform id='heliTrafo' DEF='heliTrafo' translation='4590885.87,4,-1093313.659' rotation='0 1 0 -2.29'>
                             <Inline onload='addBladeAnimation(this)' id='heliModel' namespacename='heli' url='Ingenuity_v3.glb'></Inline>
                     </Transform>
+                    <TimeSensor DEF='TSH' loop='true' cycleInterval='40' enabled='true'></TimeSensor>
+                    <PositionInterpolator DEF='PIH' key='0 0.166 0.2 0.33 0.66 0.74 0.8 1' keyValue='
+                    4590885.87 0.0 -1093313.659,
+                    4590885.87 0.0 -1093313.659,
+                    4590885.87 3.0 -1093313.659,
+                    4590884.87 3.05 -1093314.659,
+                    4590885.87 3.05 -1093313.659,
+                    4590885.87 3.0 -1093313.659,
+                    4590885.87 0.0 -1093313.659,
+                    4590885.87 0.0 -1093313.659
+                    '></PositionInterpolator>
+                    <ROUTE fromNode='TSH' fromField='fraction_changed' toNode='PIH' toField='set_fraction'></ROUTE>
+                    <ROUTE fromNode='PIH' fromField='value_changed' toNode='heliTrafo' toField='set_translation'></ROUTE>
                     <TimeSensor DEF='TS' loop='false' cycleInterval='20' enabled='true'></TimeSensor>
                     <PositionInterpolator DEF='PI' key='0 0.2 0.4 0.6 0.8 1' keyValue='
                     4590876.63 0.5 -1093299.70,
