@@ -403,13 +403,35 @@
                 root.appendChild(rot2trafo);
                 var aniContainer = document.createElement('group');
                 aniContainer.innerHTML = `
-<timesensor def="hts" loop="true" enabled="true" cycleinterval="0.3" first="true"></timesensor>
-<orientationinterpolator def="hOI1" key="0 0.5 1" keyvalue="1 0 0 0, 1 0 0 -3.14, 1 0 0 -6.28"></orientationinterpolator>
-<orientationinterpolator def="hOI2" key="0 0.5 1" keyvalue="1 0 0 0, 1 0 0  3.14, 1 0 0  6.28"></orientationinterpolator>
-<route fromnode="hts" fromfield="fraction_changed" tonode="hOI1" tofield="set_fraction"></route>
-<route fromnode="hOI1" fromfield="value_changed" tonode="glTF_NODE_rotors_01" tofield="set_rotation"></route>
-<route fromnode="hts" fromfield="fraction_changed" tonode="hOI2" tofield="set_fraction"></route>
-<route fromnode="hOI2" fromfield="value_changed" tonode="rotor2Trafo" tofield="set_rotation"></route>`
+<TimeSensor DEF="hts" loop="true" enabled="true" cycleInterval="0.3" first="true"></TimeSensor>
+<OrientationInterpolator DEF="hOI1" key="0 0.5 1" keyValue="1 0 0 0, 1 0 0 -3.14, 1 0 0 -6.28"></OrientationInterpolator>
+<OrientationInterpolator DEF="hOI2" key="0 0.5 1" keyValue="1 0 0 0, 1 0 0  3.14, 1 0 0  6.28"></OrientationInterpolator>
+<ROUTE fromNode="hts" fromField="fraction_changed" toNode="hOI1" toField="set_fraction"></ROUTE>
+<ROUTE fromNode="hOI1" fromField="value_changed" toNode="glTF_NODE_rotors_01" toField="set_rotation"></ROUTE>
+<ROUTE fromNode="hts" fromField="fraction_changed" toNode="hOI2" toField="set_fraction"></ROUTE>
+<ROUTE fromNode="hOI2" fromField="value_changed" toNode="rotor2Trafo" toField="set_rotation"></ROUTE>
+<TimeSensor DEF='TSH2' loop='true' cycleInterval='40' enabled='true'></TimeSensor>
+<BooleanSequencer DEF='BSQ' key='0 0.11 0.165 0.167 0.899 0.901 1' keyValue='
+False
+True
+False
+True
+False
+True
+False
+'></BooleanSequencer>
+<ScalarInterpolator DEF='SI' key='0 0.1 0.166 0.9 1' keyValue='
+10
+1
+0.3
+1
+10
+'></BooleanSequencer>
+<ROUTE fromNode="TSH2" fromField="fraction_changed" toNode="BSQ" toField="set_fraction"></ROUTE>
+<ROUTE fromNode="BSQ" fromField="value_changed" toNode="hts" toField="set_enabled"></ROUTE>
+<ROUTE fromNode="TSH2" fromField="fraction_changed" toNode="SI" toField="set_fraction"></ROUTE>
+<ROUTE fromNode="SI" fromField="value_changed" toNode="hts" toField="set_cycleInterval"></ROUTE>
+`
                 root.appendChild(aniContainer);
         }
 
@@ -619,7 +641,7 @@
                             <Inline onload='addBladeAnimation(this)' id='heliModel' namespacename='heli' url='Ingenuity_v3.glb'></Inline>
                     </Transform>
                     <TimeSensor DEF='TSH' loop='true' cycleInterval='40' enabled='true'></TimeSensor>
-                    <PositionInterpolator DEF='PIH' key='0 0.166 0.2 0.33 0.66 0.74 0.8 1' keyValue='
+                    <PositionInterpolator DEF='PIH' key='0 0.166 0.2 0.33 0.66 0.83 0.9 1' keyValue='
                     4590885.87 0.0 -1093313.659,
                     4590885.87 0.0 -1093313.659,
                     4590885.87 3.0 -1093313.659,
