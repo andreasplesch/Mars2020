@@ -46,6 +46,10 @@
                 left: 218px;
             }
 
+            .flightbutton {
+                left: 322px;
+            }
+
             .info-font {
                 font-family: monospace;
                 font-size: large;
@@ -476,11 +480,12 @@ False
     </script>
     <body onload='init()'>
         <div class="group">
-            <X3D xmlns="http://www.web3d.org/specifications/x3d-namespace" id="x3d" disableLeftDrag='true' disableKeys='true' showStat="false" showLog="false">
+            <X3D xmlns="http://www.web3d.org/specifications/x3d-namespace" id="x3d" _disableLeftDrag='true' disableKeys='true' showStat="false" showLog="false">
                 <button class="button resetbutton info-font" onclick='this.parentNode.runtime.resetView()'>RESET</button>
                 <button class="button mapbutton info-font" onclick='document.querySelector("#mapView").bind=true'>MAP</button>
                 <button class="button northbutton info-font" onclick='document.querySelector("#northView").bind=true'>NORTH</button>
                 <button class="button overlookbutton info-font" onclick='document.querySelector("#overlookView").bind=true'>OVERLOOK</button>
+                <button class="button flightbutton info-font" onclick='document.querySelector("#flightView").bind=true'>FLIGHT</button>
                 <div id='infoDiv' class="info info-font">X Y elevation</div>
                 <pre id='listDiv' class="list info-font">click to add points</pre>
                 <div class='small-font extra-info'>Equirectangular Mars 2000 Sphere projection</div>
@@ -514,7 +519,7 @@ False
                 </div>
                 <Scene>
                     <Environment id="gamma" gammaCorrectionDefault="none"></Environment>
-                    <NavigationInfo headlight='false' type='"EXAMINE"' explorationMode='-rotate'></NavigationInfo>
+                    <NavigationInfo headlight='false' type='"EXAMINE"' _explorationMode='-rotate'></NavigationInfo>
                     <WorldInfo title='animated Mars Rover Perserverance Map'></WorldInfo>
                     <ProtoDeclare name='WayPoint'>
                         <ProtoInterface>
@@ -593,7 +598,8 @@ False
                     <Viewpoint id="mapView" position="4590884 136 -1093313" orientation="1 0 0 -1.57" centerOfRotation="4590884 0 -1093314" fieldOfView="0.52" description="Map view"></Viewpoint>
                     <Viewpoint id="northView" position="4590891 72 -1093226" orientation="-0.99951 0.01929 -0.02464 0.67771" centerOfRotation="4590889 4 -1093301" fieldOfView="0.52" description="Perspective to N"></Viewpoint>
                     <Viewpoint id="overlookView" position="4590986.57747 15.57288 -1093303.92799" orientation="-0.06809 0.99339 0.09241 1.48611" centerOfRotation="4590883.38941 -0.35283 -1093313.61735" fieldOfView="0.52" description="Van Zyl Overlook"></Viewpoint>
-                    <Transform id='scaleTrafo' scale='1 5 1'>
+                    <Viewpoint id="flightView" position="4590914 68.2 -1093294" orientation="-0.81461 0.50662 0.28237 1.11329" centerOfRotation="4590885 0.4 -1093338" fieldOfView="0.52" description="Flight view"></Viewpoint>
+	                <Transform id='scaleTrafo' scale='1 5 1'>
                         <Transform onmousemove='mousemove(event)' onclick='mouseclick(event)' id='posTrafo' translation='4590641.917 2570 -1093538.3776'>
                             <Inline onload='modDEM(this)' namespacename='dem' url='M20_elevationgridA.x3d'></Inline>
                         </Transform>
@@ -644,10 +650,10 @@ False
                     <PositionInterpolator DEF='PIH' key='0 0.166 0.2 0.33 0.66 0.83 0.9 1' keyValue='
                     4590885.87 0.0 -1093313.659,
                     4590885.87 0.0 -1093313.659,
-                    4590885.87 3.0 -1093313.659,
-                    4590884.87 3.05 -1093314.659,
-                    4590885.87 3.05 -1093313.659,
-                    4590885.87 3.0 -1093313.659,
+                    4590885.87 5.2 -1093313.659,
+                    4590884.87 5.2 -1093363,
+                    4590884.87 5.2 -1093363,
+                    4590885.87 5.2 -1093313.659,
                     4590885.87 0.0 -1093313.659,
                     4590885.87 0.0 -1093313.659
                     '></PositionInterpolator>
