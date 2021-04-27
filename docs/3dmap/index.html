@@ -255,7 +255,7 @@
                     //parseInt(aRMC.slice(2)) < parseInt(bRMC.slice(2)) ? -1 : 1;
                 });
             var pIntp = document.querySelector('[DEF=PI]');
-            var coords = traverse.features.reduce((a, f)=>a.concat(f.geometry.coordinates), []);
+            var coords = traverse.features.reduce((a, f) => f.geometry ? a.concat(f.geometry.coordinates) : a, []);
             var key = coords.map((v, i)=>(0.1 + 0.8 * i / (coords.length - 1)).toFixed(prec));
             key.unshift(0);
             key.push(1);
