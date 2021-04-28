@@ -217,6 +217,14 @@
             TraverseURL = "https://mars.nasa.gov/mmgis-maps/M20/Layers/json/M20_traverse.json";
             //seconds
             CycleInterval = 20;
+            preloadImagesUrls = [
+                    "background/mirror/512x512-000000ff.png",
+                    "background/mirror/py.jpg",
+                    "background/mirror/pz.jpg",
+                    "background/mirror/nz.jpg",
+                    "background/mirror/px.jpg",
+                    "background/mirror/nx.jpg" ];
+            preloadImages(preloadImagesUrls);
             initWaypointsandAnimation();
             //addWaypoints();
 
@@ -224,7 +232,13 @@
             //zDimension='452' xSpacing='1.000162168140152241' zDimension='452' zSpacing='1.000774557521954211'
             //translation='4590641.917 2570 -1093538.3776'>
             //calcPanoTexCoords(document.querySelector('elevationgrid'), document.querySelector('#posTrafo'), roverPos1);
+        }
 
+        function preloadImages(urls) {
+            var container = document.createElement("loader");
+            urls.forEach( url => container.innerHTML += ` <img src="${url}" > ` );
+            document.body.appendChild(container);
+            container.remove();
         }
 
         async function initWaypointsandAnimation() {
