@@ -216,7 +216,7 @@
             All_WaypointsURL = "https://mars.nasa.gov/mmgis-maps/M20/Layers/json/M20_waypoints.json";
             TraverseURL = "https://mars.nasa.gov/mmgis-maps/M20/Layers/json/M20_traverse.json";
             //seconds
-            CycleInterval = 20;
+            CycleInterval = 40;
             preloadImagesUrls = [
                     "background/mirror/512x512-000000ff.png",
                     "background/mirror/py.jpg",
@@ -236,7 +236,7 @@
 
         function preloadImages(urls) {
             var container = document.createElement("loader");
-            urls.forEach( url => container.innerHTML += ` <img src="${url}" > ` );
+            urls.forEach( url => container.innerHTML += `<img src="${url}" >` );
             document.body.appendChild(container);
             container.style = "display: none"; // hide after appending
             //container.remove();
@@ -328,7 +328,12 @@
         function wpFromFeature(f) {
             var wp = document.createElement('WayPoint');
             var props = f.properties;
-            wp.setAttribute('location', fromLatLong(props).join());
+            var latlong = {
+                    lon: f.geometry.coordinates[0],
+                    lat: f.geometry.coordinates[1],
+                    elev_geoid: props.elev_geoid
+            };
+            wp.setAttribute('location', fromLatLong(latlong).join());
             wp.setAttribute('text', `"sol ${props.sol}, drive ${props.drive}"`);
             if (props.RMC in waypointsSizes)
             {
@@ -617,7 +622,7 @@ False
                     <!-- physicalenvironmentlight diffuse="https://x3dom.org/download/assets/pbr/papermillDiffuse.dds"
                                           specular="https://x3dom.org/download/assets/pbr/papermillSpecular.dds">
                     </physicalenvironmentlight -->
-                    <Viewpoint id="mapView" position="4590884 136 -1093313" orientation="1 0 0 -1.57" centerOfRotation="4590884 0 -1093314" fieldOfView="0.52" description="Map view"></Viewpoint>
+                    <Viewpoint id="mapView" position="4590884 183 -1093312" orientation="1 0 0 -1.57" centerOfRotation="4590884 0 -1093314" fieldOfView="0.52" description="Map view"></Viewpoint>
                     <Viewpoint id="northView" position="4590891 72 -1093226" orientation="-0.99951 0.01929 -0.02464 0.67771" centerOfRotation="4590889 4 -1093301" fieldOfView="0.52" description="Perspective to N"></Viewpoint>
                     <Viewpoint id="overlookView" position="4590986.57747 15.57288 -1093303.92799" orientation="-0.06809 0.99339 0.09241 1.48611" centerOfRotation="4590883.38941 -0.35283 -1093313.61735" fieldOfView="0.52" description="Van Zyl Overlook"></Viewpoint>
                     <Viewpoint id="flightView" position="4590914 68.2 -1093294" orientation="-0.81461 0.50662 0.28237 1.11329" centerOfRotation="4590885 0.4 -1093338" fieldOfView="0.52" description="Flight view"></Viewpoint>
