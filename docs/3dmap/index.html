@@ -50,6 +50,10 @@
                 left: 322px;
             }
 
+            .flight4button {
+                left: 416px;
+            }
+
             .info-font {
                 font-family: monospace;
                 font-size: large;
@@ -200,7 +204,7 @@
                     "3_1398" : 0.3,
                     "3_1416" : 0.3
             };
-            yScale = 5;
+            yScale = 4;
             yDatum = -2570;
             nPoints = 10;
             roverPos1 = new x3dom.fields.SFVec3f(4590876.63,1,-1093301.70);
@@ -434,23 +438,15 @@
 <ROUTE fromNode="hOI1" fromField="value_changed" toNode="glTF_NODE_rotors_01" toField="set_rotation"></ROUTE>
 <ROUTE fromNode="hts" fromField="fraction_changed" toNode="hOI2" toField="set_fraction"></ROUTE>
 <ROUTE fromNode="hOI2" fromField="value_changed" toNode="rotor2Trafo" toField="set_rotation"></ROUTE>
-<TimeSensor DEF='TSH2' loop='true' cycleInterval='40' enabled='true'></TimeSensor>
-<BooleanSequencer DEF='BSQ' key='0 0.11 0.165 0.167 0.899 0.901 1' keyValue='
-False
-True
-False
-True
-False
-True
-False
-'></BooleanSequencer>
-<ScalarInterpolator DEF='SI' key='0 0.1 0.166 0.9 1' keyValue='
-10
-1
-0.3
-1
-10
-'></BooleanSequencer>
+<TimeSensor DEF='TSH2' loop='true' cycleInterval='80' enabled='true'></TimeSensor>
+<BooleanSequencer DEF='BSQ'
+     key='0     0.11  0.165  0.167  0.899  0.901      1' 
+keyValue='False True  False   True  False   True  False'>
+</BooleanSequencer>
+<ScalarInterpolator DEF='SI' \
+     key=' 0  0.1  0.166  0.9   1' 
+keyValue='10    1    0.3    1  10'>
+</ScalarInterpolator>
 <ROUTE fromNode="TSH2" fromField="fraction_changed" toNode="BSQ" toField="set_fraction"></ROUTE>
 <ROUTE fromNode="BSQ" fromField="value_changed" toNode="hts" toField="set_enabled"></ROUTE>
 <ROUTE fromNode="TSH2" fromField="fraction_changed" toNode="SI" toField="set_fraction"></ROUTE>
@@ -505,7 +501,8 @@ False
                 <button class="button mapbutton info-font" onclick='document.querySelector("#mapView").bind=true'>MAP</button>
                 <button class="button northbutton info-font" onclick='document.querySelector("#northView").bind=true'>NORTH</button>
                 <button class="button overlookbutton info-font" onclick='document.querySelector("#overlookView").bind=true'>OVERLOOK</button>
-                <button class="button flightbutton info-font" onclick='document.querySelector("#flightView").bind=true'>FLIGHT</button>
+                <button class="button flightbutton info-font" onclick='document.querySelector("#flightView").bind=true'>FLIGHT3</button>
+                <button class="button flight4button info-font" onclick='document.querySelector("#flight4View").bind=true'>FLIGHT4</button>
                 <div id='infoDiv' class="info info-font">X Y elevation</div>
                 <pre id='listDiv' class="list info-font">click to add points</pre>
                 <div class='small-font extra-info'>Equirectangular Mars 2000 Sphere projection</div>
@@ -513,7 +510,7 @@ False
                 </div>
                 <div class='sliderbox'>
                     <input oninput="scaleY(this.value)" class='slider' type="range" id="yScale" name="yScale" step="0.1" min="1" max="9">
-                    <label class='small-font sliderlabel' for="yScale">5.0 x v.e.</label>
+                    <label class='small-font sliderlabel' for="yScale">4.0 x v.e.</label>
                 </div>
                 <div class='atright contrast'>
                     <input oninput="contrast(this.value)" class='slider' type="range" id="contrast" name="contrast" step="0.01" min="0" max="3">
@@ -626,7 +623,9 @@ False
                     <Viewpoint id="northView" position="4590891 72 -1093226" orientation="-0.99951 0.01929 -0.02464 0.67771" centerOfRotation="4590889 4 -1093301" fieldOfView="0.52" description="Perspective to N"></Viewpoint>
                     <Viewpoint id="overlookView" position="4590986.57747 15.57288 -1093303.92799" orientation="-0.06809 0.99339 0.09241 1.48611" centerOfRotation="4590883.38941 -0.35283 -1093313.61735" fieldOfView="0.52" description="Van Zyl Overlook"></Viewpoint>
                     <Viewpoint id="flightView" position="4590914 68.2 -1093294" orientation="-0.81461 0.50662 0.28237 1.11329" centerOfRotation="4590885 0.4 -1093338" fieldOfView="0.52" description="Flight view"></Viewpoint>
-	                <Transform id='scaleTrafo' scale='1 5 1'>
+	                <Viewpoint id="flight4View" position="4590965 53 -1093137" orientation="-0.71431 0.69753 0.05675 0.60154" centerOfRotation="4590885 0.4 -1093338" fieldOfView="0.52" description="Flight4 view"></Viewpoint>
+	                
+	                <Transform id='scaleTrafo' scale='1 4 1'>
                         <Transform onmousemove='mousemove(event)' onclick='mouseclick(event)' id='posTrafo' translation='4590641.917 2570 -1093538.3776'>
                             <Inline onload='modDEM(this)' namespacename='dem' url='M20_elevationgridA.x3d'></Inline>
                         </Transform>
@@ -641,7 +640,7 @@ False
                                         <!-- be sure to order cross-section points so that normal is upward -->
                                         <Extrusion solid='false' crossSection='
 0.0,0.0 0.0,-1.4 0.2,-2.9 0.5,-4.3 0.9,-5.7 1.5,-7.1 2.2,-8.3 3.1,-9.5 4.1,-10.6 5.2,-11.6 6.3,-12.5 7.6,-13.2 9.0,-13.8 10.3,-14.3 11.8,-14.6 13.2,-14.7 14.7,-14.7 16.2,-14.6 17.6,-14.3 19.0,-13.8 20.3,-13.2 21.6,-12.5 22.8,-11.6 23.9,-10.7 24.9,-9.6 25.7,-8.4 26.5,-7.1 27.1,-5.8 27.5,-4.4 27.8,-3.0 28.0,-1.5 31.2,58.0 31.2,59.4 31.1,60.9 30.8,62.3 30.3,63.7 29.7,65.1 29.0,66.3 28.2,67.5 27.2,68.6 26.1,69.6 24.9,70.5 23.6,71.2 22.3,71.8 20.9,72.3 19.5,72.6 18.0,72.7 16.6,72.7 15.1,72.6 13.7,72.3 12.3,71.8 10.9,71.2 9.7,70.5 8.5,69.6 7.4,68.7 6.4,67.6 5.5,66.4 4.8,65.1 4.2,63.8 3.7,62.4 3.4,61.0 3.3,59.5 0.0,0.0                                        ' 
-                                                spine='0 0 0, 0 5 0'
+                                                spine='0 0 0, 0 1 0'
                                                 beginCap = 'false' endCap = 'false'
                                                 >
                                         <!-- spine is open, crossSection is closed -->
@@ -670,18 +669,39 @@ False
                         </Transform>
                     </Transform>
                     <Transform id='heliTrafo' DEF='heliTrafo' translation='4590885.87,4,-1093313.659' rotation='0 1 0 0'>
+                    <Viewpoint position='0, 5, 20' centerOfRotation="0 0 0" orientation='1,0,0,-0.1'></Viewpoint>
                             <Inline onload='addBladeAnimation(this)' id='heliModel' namespacename='heli' url='Ingenuity_v3.glb'></Inline>
                     </Transform>
-                    <TimeSensor DEF='TSH' loop='true' cycleInterval='40' enabled='true'></TimeSensor>
-                    <PositionInterpolator DEF='PIH' key='0 0.166 0.2 0.33 0.66 0.83 0.9 1' keyValue='
+                    <TimeSensor DEF='TSH' loop='true' cycleInterval='80' enabled='true'></TimeSensor>
+                    <PositionInterpolator DEF='PIH' 
+                    key='
+                    0 0.05 0.066 0.11 0.22 0.28 0.3 0.33
+                    0.332 0.5 0.52 0.65 0.66 0.666
+                    0.668 0.83 0.84 0.96 0.98 1.0'
+                    keyValue='
                     4590885.87 0.0 -1093313.659,
                     4590885.87 0.0 -1093313.659,
                     4590885.87 5.2 -1093313.659,
                     4590883.13 5.2 -1093363,
                     4590883.13 5.2 -1093363,
-                    4590885.87 5.2 -1093313.659,
-                    4590885.87 0.0 -1093313.659,
-                    4590885.87 0.0 -1093313.659
+                    4590883.42 5.2 -1093313.659,
+                    4590883.42 0.0 -1093313.659,
+                    4590883.42 0.0 -1093313.659,
+
+                    4590883.42 5.2 -1093313.659,
+                    4590901.31 6.2 -1093185.31,
+                    4590901.31 6.2 -1093185.31,
+                    4590893.95 5.2 -1093314.08,
+                    4590893.95 0 -1093314.08,
+                    4590893.95 0 -1093314.08,
+
+                    4590893.95 5.2 -1093314.08,
+                    4590901.31 6.2 -1093185.31,
+                    4590901.31 11.2 -1093185.31,
+                    4590901.31 11.2 -1093185.31,
+                    4590901.31 4.0 -1093185.31
+                    4590901.31 4.0 -1093185.31
+                    
                     '></PositionInterpolator>
                     <OrientationInterpolator DEF='OIH' key='0 0.166 0.2 0.43 0.56 0.83 0.9 1' keyValue='
                     0 1 0 0
