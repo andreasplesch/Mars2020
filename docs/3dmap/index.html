@@ -401,6 +401,14 @@
             barTrafo.scale = [0.05, yScale, 0.05].join();
         }
 
+        function applyPIHscaled (e) {
+            if (e.fieldName == 'value_changed')
+            {
+                e.value.y *= yScale;
+                document.querySelector('#heliTrafo').setFieldValue('translation', e.value);
+            }
+        }
+
         function contrast(v) {
             var c = parseFloat(v);
             labelContrast.textContent = c.toFixed(2) + ' contrast';
@@ -654,6 +662,7 @@ keyValue='10    1    0.3    1  10'>
                                         </Appearance>
                                 </Shape>
                         </Transform>
+                        
                     </Transform>
                     <Transform id='roverTrafo' DEF='roverTrafo' translation='4590876.63 0 -1093299.70' rotation='0 1 0 -2.29'>
                         <Transform id='roverInitTrafo2' translation='0 0 0' _rotation='0 1 0 1.57' rotation='0 1 0 0'>
@@ -671,15 +680,18 @@ keyValue='10    1    0.3    1  10'>
                         </Transform>
                     </Transform>
                     <Transform id='heliTrafo' DEF='heliTrafo' translation='4590885.87,4,-1093313.659' rotation='0 1 0 0'>
-                    <Viewpoint position='0, 5, 20' centerOfRotation="0 0 0" orientation='1,0,0,-0.1'></Viewpoint>
+                    
+                            <Viewpoint position='0, 5, 20' centerOfRotation="0 0 0" orientation='1,0,0,-0.1'></Viewpoint>
                             <Inline onload='addBladeAnimation(this)' id='heliModel' namespacename='heli' url='Ingenuity_v3.glb'></Inline>
+                    
                     </Transform>
+                    
                     <TimeSensor DEF='TSH' loop='true' cycleInterval='80' enabled='true'></TimeSensor>
-                    <PositionInterpolator DEF='PIH' 
+                    <PositionInterpolator DEF='PIH' onoutputchange='applyPIHscaled(event)'
                     key='
                     0 0.05 0.066 0.11 0.22 0.28 0.3 0.33
-                    0.332 0.5 0.52 0.65 0.66 0.666
-                    0.668 0.83 0.84 0.96 0.98 1.0'
+                    0.338 0.5 0.52 0.64 0.65 0.666
+                    0.68 0.83 0.84 0.86 0.92 1.0'
                     keyValue='
                     4590885.87 0.0 -1093313.659,
                     4590885.87 0.0 -1093313.659,
@@ -694,15 +706,15 @@ keyValue='10    1    0.3    1  10'>
                     4590901.31 6.2 -1093185.31,
                     4590901.31 6.2 -1093185.31,
                     4590893.95 5.2 -1093314.08,
-                    4590893.95 0 -1093314.08,
-                    4590893.95 0 -1093314.08,
+                    4590893.95 0.2 -1093314.08,
+                    4590893.95 0.2 -1093314.08,
 
                     4590893.95 5.2 -1093314.08,
                     4590901.31 6.2 -1093185.31,
                     4590901.31 11.2 -1093185.31,
                     4590901.31 11.2 -1093185.31,
-                    4590901.31 4.0 -1093185.31
-                    4590901.31 4.0 -1093185.31
+                    4590901.31 1.0 -1093185.31
+                    4590901.31 1.0 -1093185.31
                     
                     '></PositionInterpolator>
                     <OrientationInterpolator DEF='OIH' key='0 0.166 0.2 0.43 0.56 0.83 0.9 1' keyValue='
@@ -716,7 +728,9 @@ keyValue='10    1    0.3    1  10'>
                     0 1 0 -1.57
                     '></OrientationInterpolator>
                     <ROUTE fromNode='TSH' fromField='fraction_changed' toNode='PIH' toField='set_fraction'></ROUTE>
+                    <!-- now script
                     <ROUTE fromNode='PIH' fromField='value_changed' toNode='heliTrafo' toField='set_translation'></ROUTE>
+                    -->
                     <ROUTE fromNode='TSH' fromField='fraction_changed' toNode='OIH' toField='set_fraction'></ROUTE>
                     <ROUTE fromNode='OIH' fromField='value_changed' toNode='heliTrafo' toField='set_rotation'></ROUTE>
                     <TimeSensor DEF='TS' loop='false' cycleInterval='20' enabled='true'></TimeSensor>
@@ -745,3 +759,4 @@ keyValue='10    1    0.3    1  10'>
         </div>
     </body>
 </html>
+
