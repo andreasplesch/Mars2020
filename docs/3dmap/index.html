@@ -263,13 +263,15 @@
             var traverse = await (await fetch(TraverseURL)).json();
             traverse.features.sort((a, b) => 
                 {
-                    var eps = 0.01;
-                    var aLength = a.properties.length;// 0.0 means last // || "3_999999";
+                    var eps = 0.000001; //0.01;
+                    var aLength = a.geometry.coordinates[0][0];//a.properties.length;// 0.0 means last // || "3_999999";
                     if (aLength == 0) { return 1 };
-                    var bLength = b.properties.length;// || "3_999999";
+                    var bLength = b.geometry.coordinates[0][0];//b.properties.length;// || "3_999999";
                     if (bLength == 0) { return -1 };
-                    var aIndex = waypoints.features.findIndex( f => Math.abs( f.properties.dist_m - aLength ) < eps );
-                    var bIndex = waypoints.features.findIndex( f => Math.abs( f.properties.dist_m - bLength ) < eps );                       
+                    //var aIndex = waypoints.features.findIndex( f => Math.abs( f.properties.dist_m - aLength ) < eps );
+                    var aIndex = waypoints.features.findIndex( f => Math.abs( f.geometry.coordinates[0] - aLength ) < eps );
+                    //var bIndex = waypoints.features.findIndex( f => Math.abs( f.properties.dist_m - bLength ) < eps );                       
+                    var bIndex = waypoints.features.findIndex( f => Math.abs( f.geometry.coordinates[0] - bLength ) < eps );
                     return aIndex < bIndex ? -1: 1; 
                     //parseInt(aRMC.slice(2)) < parseInt(bRMC.slice(2)) ? -1 : 1;
                 });
