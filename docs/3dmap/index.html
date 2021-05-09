@@ -180,6 +180,7 @@
             scaleTrafo = X3D.querySelector('#scaleTrafo');
             barTrafo = X3D.querySelector('#barTrafo');
             roverTrafo = X3D.querySelector('#roverTrafo');
+            heliTrafo = X3D.querySelector('#heliTrafo');
             roverInitTrafo = X3D.querySelector('#roverInitTrafo');
             waypointsGroup = X3D.querySelector('[DEF="WAYPOINTS"]');
             waypointsURLs = {
@@ -275,6 +276,7 @@
                     return aIndex < bIndex ? -1: 1; 
                     //parseInt(aRMC.slice(2)) < parseInt(bRMC.slice(2)) ? -1 : 1;
                 });
+            fillElevations(traverse, waypoints);
             var pIntp = document.querySelector('[DEF=PI]');
             var coords = traverse.features.reduce((a, f) => f.geometry ? a.concat(f.geometry.coordinates) : a, []);
             var key = coords.map((v, i)=>(0.1 + 0.8 * i / (coords.length - 1)).toFixed(prec));
@@ -284,7 +286,7 @@
                 return fromLatLong({
                     lon: v[0],
                     lat: v[1],
-                    elev_geoid: 1.0 * yScale
+                    elev_geoid: v[2] - yDatum, //(v[2] || (yDatum+0.5)) - yDatum,
                 }).map( v => v.toFixed(2) )
             }
             );
@@ -324,12 +326,21 @@
             //map2trueEasting = Math.cos(waypoints.features[0].geometry.coordinates[1] * deg2rad);
         }
 
-//         function addWaypoints() {
-//             fetch(All_WaypointsURL).then(response=>('json' in response) ? response.json() : console.warn(response)).then(waypoints=>{
-//                 waypoints.features.forEach(f=>waypointsGroup.appendChild(wpFromFeature(f)));
-//             }
-//             );
-//         }
+        function fillElevations(traverse, waypoints) {
+            traverse.features.forEach( f => {
+                var wFrom = waypoints.features.find( w => w.properties.RMC == f.properties.fromRMC);
+                var wTo = waypoints.features.find( w => w.properties.RMC == f.properties.toRMC);
+                var cFrom = wFrom.geometry.coordinates;
+                var cTo = wTo.geometry.coordinates;
+                
+                f.geometry.coordinates.forEach( c => {
+                    if (c[2] == 0) 
+                    {                        
+                        c[2] = cFrom[2] + ( cTo[2] - cFrom[2] ) * ( c[0] - cFrom[0] ) / ( cTo[0] - cFrom[0] );  
+                    }
+                })
+            })
+        }
 
         function wpFromFeature(f) {
             var wp = document.createElement('WayPoint');
@@ -397,15 +408,22 @@
             yScale = parseFloat(v);
             labelY.textContent = yScale.toFixed(1) + ' x v.e.';
             scaleTrafo.scale = [1, yScale, 1].join();
-            roverInitTrafo.translation = [0, -4.5 + roverPos1.y * yScale, 0].join();
-            barTrafo.scale = [0.05, yScale, 0.05].join();
+            //roverInitTrafo.translation = [0, -4.5 + roverPos1.y * yScale, 0].join();
         }
 
         function applyPIHscaled (e) {
             if (e.fieldName == 'value_changed')
             {
                 e.value.y *= yScale;
-                document.querySelector('#heliTrafo').setFieldValue('translation', e.value);
+                heliTrafo.setFieldValue('translation', e.value);
+            }
+        }
+
+        function applyPIscaled (e) {
+            if (e.fieldName == 'value_changed')
+            {
+                e.value.y *= yScale;
+                roverTrafo.setFieldValue('translation', e.value);
             }
         }
 
@@ -665,18 +683,8 @@ keyValue='10    1    0.3    1  10'>
                         
                     </Transform>
                     <Transform id='roverTrafo' DEF='roverTrafo' translation='4590876.63 0 -1093299.70' rotation='0 1 0 -2.29'>
-                        <Transform id='roverInitTrafo2' translation='0 0 0' _rotation='0 1 0 1.57' rotation='0 1 0 0'>
-                        <Transform id='roverInitTrafo' translation='0 0.5 0' _rotation='1 0 0 1.57' rotation='0 1 0 3.1415'>
+                        <Transform id='roverInitTrafo' translation='0 0.0 0' _rotation='1 0 0 1.57' rotation='0 1 0 3.1415'>
                             <Inline namespacename='rover' _url='Perseverance_v2.glb' url='Perseverance_stowed.glb' __url='Perseverance.glb'></Inline>
-                        </Transform>
-                        </Transform>
-                        <Transform id='barTrafo' scale='.05 5 .05' translation='0 -5.0 0'>
-                            <Shape>
-                                <Appearance>
-                                    <Material></Material>
-                                </Appearance>
-                                <Box></Box>
-                            </Shape>
                         </Transform>
                     </Transform>
                     <Transform id='heliTrafo' DEF='heliTrafo' translation='4590885.87,4,-1093313.659' rotation='0 1 0 0'>
@@ -714,8 +722,7 @@ keyValue='10    1    0.3    1  10'>
                     4590901.31 11.2 -1093185.31,
                     4590901.31 11.2 -1093185.31,
                     4590901.31 1.0 -1093185.31
-                    4590901.31 1.0 -1093185.31
-                    
+                    4590901.31 1.0 -1093185.31 
                     '></PositionInterpolator>
                     <OrientationInterpolator DEF='OIH' key='0 0.166 0.2 0.43 0.56 0.83 0.9 1' keyValue='
                     0 1 0 0
@@ -734,7 +741,9 @@ keyValue='10    1    0.3    1  10'>
                     <ROUTE fromNode='TSH' fromField='fraction_changed' toNode='OIH' toField='set_fraction'></ROUTE>
                     <ROUTE fromNode='OIH' fromField='value_changed' toNode='heliTrafo' toField='set_rotation'></ROUTE>
                     <TimeSensor DEF='TS' loop='false' cycleInterval='20' enabled='true'></TimeSensor>
-                    <PositionInterpolator DEF='PI' key='0 0.2 0.4 0.6 0.8 1' keyValue='
+                    <PositionInterpolator DEF='PI' onoutputchange='applyPIscaled(event)'
+                    key='0 0.2 0.4 0.6 0.8 1' 
+                    keyValue='
                     4590876.63 0.5 -1093299.70,
                     4590876.63 0.5 -1093301.70,
                     4590880.59 0.5 -1093297.35,
@@ -751,7 +760,9 @@ keyValue='10    1    0.3    1  10'>
                     0 1 0 2.6179
                     '></OrientationInterpolator>
                     <ROUTE fromNode='TS' fromField='fraction_changed' toNode='PI' toField='set_fraction'></ROUTE>
+                    <!-- now script
                     <ROUTE fromNode='PI' fromField='value_changed' toNode='roverTrafo' toField='set_translation'></ROUTE>
+                    -->
                     <ROUTE fromNode='TS' fromField='fraction_changed' toNode='OI' toField='set_fraction'></ROUTE>
                     <ROUTE fromNode='OI' fromField='value_changed' toNode='roverTrafo' toField='set_rotation'></ROUTE>
                 </Scene>
