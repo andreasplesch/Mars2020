@@ -128,6 +128,7 @@
 
             .help {
                 top: 5px;
+                max-width: 300px;
             }
 
             .helpText {
@@ -199,7 +200,11 @@
                     "3_1708" : "http://www.unmannedspaceflight.com/index.php?s=&showtopic=8608&view=findpost&p=251494",
                     "3_1850" : "https://mars.nasa.gov/resources/25796/ingenuity-begins-to-spin-its-blades/",
                     "3_1950" : "http://www.unmannedspaceflight.com/index.php?s=&showtopic=8608&view=findpost&p=251540",
-                    "3_2046" : "https://mars.nasa.gov/resources/25828/first-video-of-nasas-ingenuity-mars-helicopter-in-flight/"
+                    "3_2046" : "https://mars.nasa.gov/resources/25828/first-video-of-nasas-ingenuity-mars-helicopter-in-flight/",
+                    "3_2150" : "https://mars.nasa.gov/news/8930/nasas-ingenuity-mars-helicopter-flies-faster-farther-on-third-flight/",
+                    "3_2208" : "http://www.unmannedspaceflight.com/index.php?showtopic=8608&view=findpost&p=251943",
+                    "3_2346" : "http://www.unmannedspaceflight.com/index.php?showtopic=8625&st=0&p=252044&#entry252044",
+                    "3_2430" : "https://mars.nasa.gov/news/8941/nasas-perseverance-captures-video-audio-of-fourth-ingenuity-flight/"
             };
             waypointsSizes = {
                     "3_1398" : 0.3,
@@ -229,7 +234,7 @@
                     "background/mirror1k/nz.jpg",
                     "background/mirror1k/px.jpg",
                     "background/mirror1k/nx.jpg" ];
-            preloadImages(preloadImagesUrls);
+            //preloadImages(preloadImagesUrls);
             initWaypointsandAnimation();
             //addWaypoints();
 
@@ -398,7 +403,7 @@
                 };
                 var n = pointStack.unshift(point);
             }
-            listDiv.textContent = "clicked points, true distance from last [m]:\n\n" + pointStack.slice(0, nPoints).map(ppPoint).join("\n");
+            listDiv.textContent = "clicked point, true distance from last [m]:\n\n" + pointStack.slice(0, nPoints).map(ppPoint).join("\n");
             function ppPoint(p) {
                 return [p.pos.x, -p.pos.z, p.pos.y, p.trueDst].map(prettify).join(' ')
             }
@@ -532,7 +537,7 @@ keyValue='10    1    0.3    1  10'>
                 <button class="button flightbutton info-font" onclick='document.querySelector("#flightView").bind=true'>FLIGHT3</button>
                 <button class="button flight4button info-font" onclick='document.querySelector("#flight4View").bind=true'>FLIGHT4</button>
                 <div id='infoDiv' class="info info-font">X Y elevation</div>
-                <pre id='listDiv' class="list info-font">click to add points</pre>
+                <pre id='listDiv' class="list info-font">digitize points</pre>
                 <div class='small-font extra-info'>Equirectangular Mars 2000 Sphere projection</div>
                 <div id='attributions' class="small-font attribution">NASA/JPL-Caltech/Mars2020 HiRISE/T. Appéré (c)2021 Andreas Plesch
                 </div>
@@ -565,7 +570,13 @@ keyValue='10    1    0.3    1  10'>
                                 <img class="mouseSVG" src="media/Mouse_1.svg"></img>
                                 double click to recenter
                             </li>
-                            
+                            <li> 
+                                <hr>
+                                Use buttons on top row for alternative views. If lost, click RESET. 
+                                v.e. slider adjusts vertical exaggeration. contrast slider adjusts overall image contrast.
+                                Blue domes are rover way points and are linked to relevant content.
+                                Rover and helicopter are at scale.
+                            </li>
                         </ul>
                     </div>
                 </div>
@@ -647,11 +658,12 @@ keyValue='10    1    0.3    1  10'>
                     <!-- physicalenvironmentlight diffuse="https://x3dom.org/download/assets/pbr/papermillDiffuse.dds"
                                           specular="https://x3dom.org/download/assets/pbr/papermillSpecular.dds">
                     </physicalenvironmentlight -->
-                    <Viewpoint id="mapView" position="4590884 183 -1093312" orientation="1 0 0 -1.57" centerOfRotation="4590884 0 -1093314" fieldOfView="0.52" description="Map view"></Viewpoint>
+                    <Viewpoint id="mapView" position="4590884 215 -1093312" orientation="1 0 0 -1.57" centerOfRotation="4590884 0 -1093314" fieldOfView="0.52" description="Map view"></Viewpoint>
                     <Viewpoint id="northView" position="4590891 72 -1093226" orientation="-0.99951 0.01929 -0.02464 0.67771" centerOfRotation="4590889 4 -1093301" fieldOfView="0.52" description="Perspective to N"></Viewpoint>
-                    <Viewpoint id="overlookView" position="4590986.57747 15.57288 -1093303.92799" orientation="-0.06809 0.99339 0.09241 1.48611" centerOfRotation="4590883.38941 -0.35283 -1093313.61735" fieldOfView="0.52" description="Van Zyl Overlook"></Viewpoint>
-                    <Viewpoint id="flightView" position="4590914 68.2 -1093294" orientation="-0.81461 0.50662 0.28237 1.11329" centerOfRotation="4590885 0.4 -1093338" fieldOfView="0.52" description="Flight view"></Viewpoint>
-	                <Viewpoint id="flight4View" position="4590965 53 -1093137" orientation="-0.71431 0.69753 0.05675 0.60154" centerOfRotation="4590885 0.4 -1093338" fieldOfView="0.52" description="Flight4 view"></Viewpoint>
+                    <Viewpoint id="overlookView" position="4590974 13.63 -1093305" orientation="-0.06809 0.99339 0.09241 1.48611" centerOfRotation="4590883.38941 0 -1093313.61735" fieldOfView="0.78" description="Van Zyl Overlook"></Viewpoint>
+	                <Viewpoint id="flightView" position="4590914 68.2 -1093294" orientation="-0.81461 0.50662 0.28237 1.11329" centerOfRotation="4590885 0.4 -1093338" fieldOfView="0.52" description="Flight view"></Viewpoint>
+	                <Viewpoint id="flight4View" position="4590974 62.5 -1093118" orientation="-0.71431 0.69753 0.05675 0.60154" centerOfRotation="4590885 0.4 -1093338" fieldOfView="0.52" description="Flight4 view"></Viewpoint>
+
 	                
 	                <Transform id='scaleTrafo' scale='1 4 1'>
                         <Transform onmousemove='mousemove(event)' onclick='mouseclick(event)' id='posTrafo' translation='4590641.917 2570 -1093538.3776'>
@@ -683,7 +695,7 @@ keyValue='10    1    0.3    1  10'>
                         
                     </Transform>
                     <Transform id='roverTrafo' DEF='roverTrafo' translation='4590876.63 0 -1093299.70' rotation='0 1 0 -2.29'>
-                        <Transform id='roverInitTrafo' translation='0 0.0 0' _rotation='1 0 0 1.57' rotation='0 1 0 3.1415'>
+                        <Transform id='roverInitTrafo' translation='0 0.1 0' _rotation='1 0 0 1.57' rotation='0 1 0 3.1415'>
                             <Inline namespacename='rover' _url='Perseverance_v2.glb' url='Perseverance_stowed.glb' __url='Perseverance.glb'></Inline>
                         </Transform>
                     </Transform>
@@ -721,8 +733,8 @@ keyValue='10    1    0.3    1  10'>
                     4590901.31 6.2 -1093185.31,
                     4590901.31 11.2 -1093185.31,
                     4590901.31 11.2 -1093185.31,
-                    4590901.31 1.0 -1093185.31
-                    4590901.31 1.0 -1093185.31 
+                    4590901.31 1.1 -1093185.31
+                    4590901.31 1.1 -1093185.31 
                     '></PositionInterpolator>
                     <OrientationInterpolator DEF='OIH' key='0 0.166 0.2 0.43 0.56 0.83 0.9 1' keyValue='
                     0 1 0 0
