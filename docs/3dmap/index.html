@@ -380,7 +380,12 @@
         }
 
         function mousemove(e) {
-            infoDiv.textContent = `X X_t Y elevation: ` + [e.worldX, e.worldX * map2trueEasting, -e.worldZ, e.worldY / yScale + yDatum].map(prettify).join(" ");
+            
+            var location = [e.worldX, e.worldX * map2trueEasting, -e.worldZ, e.worldY / yScale + yDatum];
+            var current = pointStack[0].pos;
+            var az = (Math.atan2( -location[2] - current.z, location[0] - current.x ) * 180/Math.PI + 90 + 360) % 360;
+            
+            infoDiv.textContent = location.concat([az]).map(prettify).join(" ");   
         }
 
         function prettify(x) {
@@ -389,7 +394,7 @@
 
         function mouseclick(e) {
             var prev = pointStack[0];
-            var pos = new x3dom.fields.SFVec3f(e.worldX,e.worldY / yScale + yDatum,e.worldZ);
+            var pos = new x3dom.fields.SFVec3f(e.worldX, e.worldY / yScale + yDatum, e.worldZ);
             if (prev.pos.equals(pos, 0.01)) // assume double click
             {
                 pointStack.shift();
@@ -536,7 +541,10 @@ keyValue='10    1    0.3    1  10'>
                 <button class="button overlookbutton info-font" onclick='document.querySelector("#overlookView").bind=true'>OVERLOOK</button>
                 <button class="button flightbutton info-font" onclick='document.querySelector("#flightView").bind=true'>FLIGHT3</button>
                 <button class="button flight4button info-font" onclick='document.querySelector("#flight4View").bind=true'>FLIGHT4</button>
-                <div id='infoDiv' class="info info-font">X Y elevation</div>
+                <div id='cursorinfo' class="info info-font">
+                <div>X X_t Y el. az.:</div>
+                <div id='infoDiv'>cursor</div>
+                </div>
                 <pre id='listDiv' class="list info-font">digitize points</pre>
                 <div class='small-font extra-info'>Equirectangular Mars 2000 Sphere projection</div>
                 <div id='attributions' class="small-font attribution">NASA/JPL-Caltech/Mars2020 HiRISE/T. Appéré (c)2021 Andreas Plesch
