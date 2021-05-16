@@ -258,7 +258,9 @@
             if ('json' in waypointsResponse )
             {
                 waypoints = await waypointsResponse.json();
-                waypoints.features.forEach(f=>waypointsGroup.appendChild(wpFromFeature(f)));
+                waypoints.features.
+                   filter(f=>f.properties.site>2).
+                   forEach(f=>waypointsGroup.appendChild(wpFromFeature(f)));
             }
             else { console.warn(waypointsResponse) };
             
@@ -790,4 +792,3 @@ keyValue='10    1    0.3    1  10'>
         </div>
     </body>
 </html>
-
