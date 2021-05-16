@@ -335,8 +335,8 @@
             traverse.features.forEach( f => {
                 var wFrom = waypoints.features.find( w => w.properties.RMC == f.properties.fromRMC);
                 var wTo = waypoints.features.find( w => w.properties.RMC == f.properties.toRMC);
-                var cFrom = wFrom.geometry.coordinates;
-                var cTo = wTo.geometry.coordinates;
+                var cFrom = wFrom && wFrom.geometry.coordinates;
+                var cTo = wTo && wTo.geometry.coordinates;
                 
                 f.geometry.coordinates.forEach( c => {
                     if (c[2] == 0) 
