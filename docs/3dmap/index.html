@@ -35,23 +35,27 @@
             }
 
             .mapbutton {
-                left: 80px;
+                left: 65px;
             }
 
             .northbutton {
-                left: 140px;
+                left: 112px;
             }
 
             .overlookbutton {
-                left: 218px;
+                left: 178px;
             }
 
             .flightbutton {
-                left: 322px;
+                left: 270px;
             }
 
             .flight4button {
-                left: 416px;
+                left: 354px;
+            }
+
+            .helibutton {
+                left: 438px;
             }
 
             .info-font {
@@ -496,8 +500,18 @@ keyValue='10    1    0.3    1  10'>
         }
 
         function modDEM (inline) {
-                var material = inline.querySelector('Material');
-                material.setAttribute('ambientintensity', '2.1');
+            var material = inline.querySelector('Material');
+            material.setAttribute('ambientintensity', '2.1');
+        }
+
+        function changeView (elementID, mode) {
+                document.querySelector(elementID).bind = true;
+                if (mode == "disableDrag") {
+                    X3D.runtime.disableLeftDrag();
+                }
+                else {
+                     X3D.runtime.enableLeftDrag();       
+                }
         }
 
         // NOT USED
@@ -538,11 +552,12 @@ keyValue='10    1    0.3    1  10'>
         <div class="group">
             <X3D xmlns="http://www.web3d.org/specifications/x3d-namespace" id="x3d" _disableLeftDrag='true' disableKeys='true' showStat="false" showLog="false">
                 <button class="button resetbutton info-font" onclick='this.parentNode.runtime.resetView()'>RESET</button>
-                <button class="button mapbutton info-font" onclick='document.querySelector("#mapView").bind=true'>MAP</button>
-                <button class="button northbutton info-font" onclick='document.querySelector("#northView").bind=true'>NORTH</button>
-                <button class="button overlookbutton info-font" onclick='document.querySelector("#overlookView").bind=true'>OVERLOOK</button>
-                <button class="button flightbutton info-font" onclick='document.querySelector("#flightView").bind=true'>FLIGHT3</button>
-                <button class="button flight4button info-font" onclick='document.querySelector("#flight4View").bind=true'>FLIGHT4</button>
+                <button class="button mapbutton info-font" onclick='changeView("#mapView")'>MAP</button>
+                <button class="button northbutton info-font" onclick='changeView("#northView")'>NORTH</button>
+                <button class="button overlookbutton info-font" onclick='changeView("#overlookView")'>OVERLOOK</button>
+                <button class="button flightbutton info-font" onclick='changeView("#flightView")'>FLIGHT3</button>
+                <button class="button flight4button info-font" onclick='changeView("#flight4View")'>FLIGHT4</button>
+                <button class="button helibutton info-font" onclick='changeView("#heliView", "disableDrag")'>HELI</button>
                 <div id='cursorinfo' class="info info-font">
                 <div>X X_t Y el. az.:</div>
                 <div id='infoDiv'>cursor</div>
@@ -672,8 +687,7 @@ keyValue='10    1    0.3    1  10'>
                     <Viewpoint id="northView" position="4590891 72 -1093226" orientation="-0.99951 0.01929 -0.02464 0.67771" centerOfRotation="4590889 4 -1093301" fieldOfView="0.52" description="Perspective to N"></Viewpoint>
                     <Viewpoint id="overlookView" position="4590974 13.63 -1093305" orientation="-0.06809 0.99339 0.09241 1.48611" centerOfRotation="4590883.38941 0 -1093313.61735" fieldOfView="0.78" description="Van Zyl Overlook"></Viewpoint>
 	                <Viewpoint id="flightView" position="4590914 68.2 -1093294" orientation="-0.81461 0.50662 0.28237 1.11329" centerOfRotation="4590885 0.4 -1093338" fieldOfView="0.52" description="Flight view"></Viewpoint>
-	                <Viewpoint id="flight4View" position="4590974 62.5 -1093118" orientation="-0.71431 0.69753 0.05675 0.60154" centerOfRotation="4590885 0.4 -1093338" fieldOfView="0.52" description="Flight4 view"></Viewpoint>
-
+	                <Viewpoint id="flight4View" position="4590974 62.5 -1093118" orientation="-0.71431 0.69753 0.05675 0.60154" centerOfRotation="4590900 3.35 -1093243" fieldOfView="0.52" description="Flight4 view"></Viewpoint>
 	                
 	                <Transform id='scaleTrafo' scale='1 4 1'>
                         <Transform onmousemove='mousemove(event)' onclick='mouseclick(event)' id='posTrafo' translation='4590641.917 2570 -1093538.3776'>
@@ -705,14 +719,19 @@ keyValue='10    1    0.3    1  10'>
                         
                     </Transform>
                     <Transform id='roverTrafo' DEF='roverTrafo' translation='4590876.63 0 -1093299.70' rotation='0 1 0 -2.29'>
+                                                <Viewpoint id='roverView' position='0, 2, 0' orientation='1,0,0,-0.1'></Viewpoint>
+
                         <Transform id='roverInitTrafo' translation='0 0.1 0' _rotation='1 0 0 1.57' rotation='0 1 0 3.1415'>
                             <Inline namespacename='rover' _url='Perseverance_v2.glb' url='Perseverance_stowed.glb' __url='Perseverance.glb'></Inline>
                         </Transform>
                     </Transform>
                     <Transform id='heliTrafo' DEF='heliTrafo' translation='4590885.87,4,-1093313.659' rotation='0 1 0 0'>
                     
-                            <Viewpoint position='0, 5, 20' centerOfRotation="0 0 0" orientation='1,0,0,-0.1'></Viewpoint>
-                            <Inline onload='addBladeAnimation(this)' id='heliModel' namespacename='heli' url='Ingenuity_v3.glb'></Inline>
+                        <Transform id='heliCam' DEF='heliCam' rotation='0 1 0 3.14'>
+                            <Viewpoint id='heliView' position='0, 1, 0' orientation='1,0,0,-0.1'></Viewpoint>
+                        </Transform>        
+                    
+                        <Inline onload='addBladeAnimation(this)' id='heliModel' namespacename='heli' url='Ingenuity_v3.glb'></Inline>
                     
                     </Transform>
                     
@@ -740,11 +759,11 @@ keyValue='10    1    0.3    1  10'>
                     4590893.95 0.2 -1093314.08,
 
                     4590893.95 5.2 -1093314.08,
-                    4590901.31 6.2 -1093185.31,
-                    4590901.31 11.2 -1093185.31,
-                    4590901.31 11.2 -1093185.31,
-                    4590901.31 1.1 -1093185.31
-                    4590901.31 1.1 -1093185.31 
+                    4590908.31 6.2 -1093185.31,
+                    4590908.31 11.2 -1093185.31,
+                    4590908.31 11.2 -1093185.31,
+                    4590908.31 1.1 -1093185.31
+                    4590908.31 1.1 -1093185.31 
                     '></PositionInterpolator>
                     <OrientationInterpolator DEF='OIH' key='0 0.166 0.2 0.43 0.56 0.83 0.9 1' keyValue='
                     0 1 0 0
@@ -792,3 +811,4 @@ keyValue='10    1    0.3    1  10'>
         </div>
     </body>
 </html>
+
