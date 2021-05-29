@@ -1,5 +1,4 @@
 <html>
   Drag to location bar:
-  <span id="bookmark"><a href='javascript:(function(){s=[];document.querySelector(".raw_images_list").querySelectorAll("img").forEach(img=>s.push(img.src.replace("_320.jpg",".png")));alert(s.join(" "))})()
-' name="bmklink">Extract Raw Urls</a></span>
+  <span id="bookmark"><a href='javascript:(function(){s=[];document.querySelector(".raw_images_list").querySelectorAll("img").forEach(img=>s.push(img.src.replace("_320.jpg",".png")));var w=window.open();w.document.write("<small>"+s.join(" ")+"</small>");w.document.close();})()' name="bmklink">Extract Raw Urls</a></span>
 </html>
