@@ -342,7 +342,9 @@
                 var wFrom = waypoints.features.find( w => w.properties.RMC == f.properties.fromRMC);
                 var wTo = waypoints.features.find( w => w.properties.RMC == f.properties.toRMC);
                 var cFrom = wFrom && wFrom.geometry.coordinates;
+                cFrom[2] = +wFrom.properties.elev_geoid;
                 var cTo = wTo && wTo.geometry.coordinates;
+                cTo[2] = +wTo.properties.elev_geoid;
                 
                 f.geometry.coordinates.forEach( c => {
                     if (c[2] == 0) 
